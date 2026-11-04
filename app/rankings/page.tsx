@@ -1,3 +1,4 @@
+import Link from "next/link";
 export const metadata={title:"Rankings · Escuadrón Salchichón"};
 const categories=["Player Value","Tiempo jugado","Muertes oficiales","Tótems utilizados"];
-export default function RankingsPage(){return <main className="subpage"><a href="/">← Portal oficial</a><header><small>COMPETENCIA / CLASIFICACIONES</small><h1>Los rankings.</h1><p>El progreso de la temporada, medido con estadísticas oficiales.</p></header><section className="ranking-list">{categories.map((name,i)=><article key={name}><small>0{i+1}</small><h2>{name}</h2><b>—</b><span>Esperando conexión con la API</span></article>)}</section></main>}
+export default function RankingsPage(){return <main className="subpage"><Link href="/">← Portal oficial</Link><header><small>COMPETENCIA / CLASIFICACIONES</small><h1>Los rankings.</h1><p>El progreso de la temporada, medido con estadísticas oficiales.</p></header><section className="ranking-list">{categories.map((name,i)=><article key={name}><small>0{i+1}</small><h2>{name}</h2><b>—</b><span>Esperando conexión con la API</span></article>)}</section></main>}
