@@ -1,0 +1,28 @@
+server:
+  port: ${PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+
+spring:
+  application:
+    name: salchichon-api
+  datasource:
+    url: ${SALCHICHON_API_DB_URL:jdbc:postgresql://127.0.0.1:5432/salchichon}
+    username: ${SALCHICHON_API_DB_USER:salchichon_readonly}
+    password: ${SALCHICHON_API_DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: 8
+      minimum-idle: 1
+      connection-timeout: 10000
+  flyway:
+    enabled: ${SALCHICHON_API_FLYWAY_ENABLED:false}
+    locations: classpath:db/migration
+
+salchichon:
+  web:
+    allowed-origins: ${SALCHICHON_WEB_ORIGINS:http://localhost:3000}
+  season:
+    name: ${SALCHICHON_SEASON_NAME:UHC SEASON 1}
+    difficulty: ${SALCHICHON_SEASON_DIFFICULTY:HARD}
+    start-date: ${SALCHICHON_SEASON_START_DATE:2026-10-19}

@@ -1,0 +1,109 @@
+package com.escuadronsalchichon.api.repository;
+
+import com.escuadronsalchichon.api.dto.AnnouncementResponse;
+import com.escuadronsalchichon.api.dto.PlayerSummaryResponse;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Repository
+public class PublicDataRepository {
+    private final JdbcTemplate jdbc;
+
+    public PublicDataRepository(JdbcTemplate jdbc) {
+        this.jdbc = jdbc;
+    }
+
+    public long[] overviewTotals() {
+        return jdbc.queryForObject("""
+                SELECT COUNT(pd.uuid),
+                       COALESCE(SUM(ps.official_deaths), 0),
+                       COALESCE(SUM(ps.playtime_ticks), 0),
+                       COALESCE(SUM(ps.player_value), 0)
+                FROM player_data pd
+                LEFT JOIN player_stats ps ON ps.player_uuid = pd.uuid
+                """, (rs, row) -> new long[]{
+                rs.getLong(1), rs.getLong(2), rs.getLong(3), rs.getLong(4)
+        });
+    }
+
+    public List<PlayerSummaryResponse> findPlayers(int limit, int offset, String sort) {
+        String orderBy = orderBy(sort);
+        String sql = """
+                SELECT pd.uuid, pd.username, pd.last_death_date, pd.totem_uses,
+                       COALESCE(ps.official_deaths, 0) AS official_deaths,
+                       COALESCE(ps.playtime_ticks, 0) AS playtime_ticks,
+                       COALESCE(ps.player_value, 0) AS player_value
+                FROM player_data pd
+                LEFT JOIN player_stats ps ON ps.player_uuid = pd.uuid
+                ORDER BY %s
+                LIMIT ? OFFSET ?
+                """.formatted(orderBy);
+        return jdbc.query(sql, (rs, row) -> new PlayerSummaryResponse(
+                rs.getObject("uuid", UUID.class),
+                rs.getString("username"),
+                rs.getObject("last_death_date", java.time.LocalDate.class),
+                rs.getLong("totem_uses"),
+                rs.getLong("official_deaths"),
+                rs.getLong("playtime_ticks"),
+                rs.getLong("player_value")
+        ), limit, offset);
+    }
+
+    public Optional<PlayerSummaryResponse> findPlayer(UUID uuid) {
+        List<PlayerSummaryResponse> rows = jdbc.query("""
+                SELECT pd.uuid, pd.username, pd.last_death_date, pd.totem_uses,
+                       COALESCE(ps.official_deaths, 0) AS official_deaths,
+                       COALESCE(ps.playtime_ticks, 0) AS playtime_ticks,
+                       COALESCE(ps.player_value, 0) AS player_value
+                FROM player_data pd
+                LEFT JOIN player_stats ps ON ps.player_uuid = pd.uuid
+                WHERE pd.uuid = ?
+                """, (rs, row) -> new PlayerSummaryResponse(
+                rs.getObject("uuid", UUID.class),
+                rs.getString("username"),
+                rs.getObject("last_death_date", java.time.LocalDate.class),
+                rs.getLong("totem_uses"),
+                rs.getLong("official_deaths"),
+                rs.getLong("playtime_ticks"),
+                rs.getLong("player_value")
+        ), uuid);
+        return rows.stream().findFirst();
+    }
+
+    public List<AnnouncementResponse> findAnnouncements(int limit) {
+        return jdbc.query("""
+                SELECT id, title, body, category, published_at, expires_at
+                FROM public_announcements
+                WHERE is_published = TRUE
+                  AND published_at <= now()
+                  AND (expires_at IS NULL OR expires_at > now())
+                ORDER BY published_at DESC, id DESC
+                LIMIT ?
+                """, (rs, row) -> new AnnouncementResponse(
+                rs.getLong("id"),
+                rs.getString("title"),
+                rs.getString("body"),
+                rs.getString("category"),
+                rs.getObject("published_at", java.time.OffsetDateTime.class),
+                rs.getObject("expires_at", java.time.OffsetDateTime.class)
+        ), limit);
+    }
+
+    public boolean databaseReady() {
+        Integer result = jdbc.queryForObject("SELECT 1", Integer.class);
+        return result != null && result == 1;
+    }
+
+    private String orderBy(String sort) {
+        return switch (sort.toLowerCase(java.util.Locale.ROOT)) {
+            case "deaths" -> "official_deaths DESC, pd.username ASC";
+            case "playtime" -> "playtime_ticks DESC, pd.username ASC";
+            case "totems" -> "pd.totem_uses DESC, pd.username ASC";
+            default -> "player_value DESC, pd.username ASC";
+        };
+    }
+}
