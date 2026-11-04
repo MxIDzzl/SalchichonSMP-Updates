@@ -1,3 +1,4 @@
+import Link from "next/link";
 const features = [
   { number: "01", title: "Supervivencia", text: "Cada decisión cuenta. Las vidas, las muertes y el tiempo de juego forman parte de la historia de la temporada." },
   { number: "02", title: "Progreso real", text: "Estadísticas oficiales y registros persistentes. Sin rankings inventados ni datos de demostración." },
@@ -20,7 +21,7 @@ export default function Home() {
       <div className="topline"><span className="status-dot" /> PORTAL OFICIAL <span className="topline-right">MINECRAFT · HARDCORE SMP</span></div>
       <header className="nav wrap">
         <a className="brand" href="#"><span className="brand-mark">S</span><span>ESCUADRÓN<span className="brand-muted"> SALCHICHÓN</span></span></a>
-        <nav>{nav.map(([label, href]) => <a key={href} href={href}>{label}</a>)}</nav>
+        <nav>{nav.map(([label, href]) => <Link key={href} href={href}>{label}</Link>)}</nav>
         <a className="nav-cta" href="#updates">Explorar <span>↗</span></a>
       </header>
 
