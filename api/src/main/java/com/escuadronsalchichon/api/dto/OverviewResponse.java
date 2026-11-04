@@ -6,7 +6,7 @@ public record OverviewResponse(
         long players,
         long officialDeaths,
         long playtimeTicks,
-        long playerValue,
+        String playerValue,
         String seasonName,
         String difficulty,
         String seasonStartDate,

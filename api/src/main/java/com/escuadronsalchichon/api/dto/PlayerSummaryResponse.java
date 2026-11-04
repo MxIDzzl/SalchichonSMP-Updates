@@ -10,5 +10,5 @@ public record PlayerSummaryResponse(
         long totemUses,
         long officialDeaths,
         long playtimeTicks,
-        long playerValue
+        String playerValue
 ) {}

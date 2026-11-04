@@ -17,7 +17,7 @@ public class PublicDataRepository {
         this.jdbc = jdbc;
     }
 
-    public long[] overviewTotals() {
+    public OverviewTotals overviewTotals() {
         return jdbc.queryForObject("""
                 SELECT COUNT(pd.uuid),
                        COALESCE(SUM(ps.official_deaths), 0),
@@ -25,9 +25,9 @@ public class PublicDataRepository {
                        COALESCE(SUM(ps.player_value), 0)
                 FROM player_data pd
                 LEFT JOIN player_stats ps ON ps.player_uuid = pd.uuid
-                """, (rs, row) -> new long[]{
-                rs.getLong(1), rs.getLong(2), rs.getLong(3), rs.getLong(4)
-        });
+                """, (rs, row) -> new OverviewTotals(
+                rs.getLong(1), rs.getLong(2), rs.getLong(3), rs.getBigDecimal(4).toPlainString()
+        ));
     }
 
     public List<PlayerSummaryResponse> findPlayers(int limit, int offset, String sort) {
@@ -49,7 +49,7 @@ public class PublicDataRepository {
                 rs.getLong("totem_uses"),
                 rs.getLong("official_deaths"),
                 rs.getLong("playtime_ticks"),
-                rs.getLong("player_value")
+                rs.getBigDecimal("player_value").toPlainString()
         ), limit, offset);
     }
 
@@ -69,7 +69,7 @@ public class PublicDataRepository {
                 rs.getLong("totem_uses"),
                 rs.getLong("official_deaths"),
                 rs.getLong("playtime_ticks"),
-                rs.getLong("player_value")
+                rs.getBigDecimal("player_value").toPlainString()
         ), uuid);
         return rows.stream().findFirst();
     }
@@ -106,4 +106,6 @@ public class PublicDataRepository {
             default -> "player_value DESC, pd.username ASC";
         };
     }
+
+    public record OverviewTotals(long players, long officialDeaths, long playtimeTicks, String playerValue) {}
 }

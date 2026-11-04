@@ -39,9 +39,9 @@ public class PublicApiController {
 
     @GetMapping("/public/overview")
     public OverviewResponse overview() {
-        long[] totals = repository.overviewTotals();
-        return new OverviewResponse(totals[0], totals[1], totals[2], totals[3],
-                seasonName, difficulty, seasonStartDate, Instant.now());
+        PublicDataRepository.OverviewTotals totals = repository.overviewTotals();
+        return new OverviewResponse(totals.players(), totals.officialDeaths(), totals.playtimeTicks(),
+                totals.playerValue(), seasonName, difficulty, seasonStartDate, Instant.now());
     }
 
     @GetMapping("/public/players")
