@@ -2,7 +2,7 @@ export type Overview = {
   players: number;
   officialDeaths: number;
   playtimeTicks: number;
-  playerValue: number;
+  playerValue: string;
   seasonName: string;
   difficulty: string;
   seasonStartDate: string;
@@ -70,9 +70,9 @@ export function formatPlaytime(ticks: number) {
   return `${totalHours}h`;
 }
 
-export function formatValue(value: number) {
+export function formatValue(value: string) {
   return new Intl.NumberFormat("es-MX", {
     notation: "compact",
     maximumFractionDigits: 1,
-  }).format(value);
+  }).format(BigInt(value));
 }
