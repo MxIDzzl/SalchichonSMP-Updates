@@ -14,6 +14,7 @@ spring:
     hikari:
       maximum-pool-size: 8
       minimum-idle: 1
+      read-only: true
       connection-timeout: 10000
   flyway:
     enabled: ${SALCHICHON_API_FLYWAY_ENABLED:false}
