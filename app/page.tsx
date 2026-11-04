@@ -1,4 +1,8 @@
 import Link from "next/link";
+import { formatPlaytime, formatValue, getAnnouncements, getOverview } from "@/lib/public-api";
+
+export const dynamic = "force-dynamic";
+
 const features = [
   { number: "01", title: "Supervivencia", text: "Cada decisión cuenta. Las vidas, las muertes y el tiempo de juego forman parte de la historia de la temporada." },
   { number: "02", title: "Progreso real", text: "Estadísticas oficiales y registros persistentes. Sin rankings inventados ni datos de demostración." },
@@ -13,15 +17,17 @@ const nav = [
   ["Novedades", "#updates"],
 ];
 
-export default function Home() {
-  const apiConfigured = Boolean(process.env.NEXT_PUBLIC_SALCHICHON_API_URL);
+export default async function Home() {
+  const [overview, announcements] = await Promise.all([getOverview(), getAnnouncements(1)]);
+  const apiConfigured = Boolean(process.env.SALCHICHON_API_URL);
+  const latestAnnouncement = announcements?.[0];
 
   return (
     <main>
       <div className="topline"><span className="status-dot" /> PORTAL OFICIAL <span className="topline-right">MINECRAFT · HARDCORE SMP</span></div>
       <header className="nav wrap">
         <a className="brand" href="#"><span className="brand-mark">S</span><span>ESCUADRÓN<span className="brand-muted"> SALCHICHÓN</span></span></a>
-        <nav>{nav.map(([label, href]) => <Link key={href} href={href}>{label}</Link>)}</nav>
+        <nav>{nav.map(([label, href]) => href.startsWith("/") ? <Link key={href} href={href}>{label}</Link> : <a key={href} href={href}>{label}</a>)}</nav>
         <a className="nav-cta" href="#updates">Explorar <span>↗</span></a>
       </header>
 
@@ -46,20 +52,20 @@ export default function Home() {
 
       <section className="season-band" id="season">
         <div className="wrap season-inner">
-          <div><div className="section-kicker">01 / TEMPORADA</div><h2>UHC SEASON 1</h2><p>La temporada actual del Escuadrón Salchichón.</p></div>
-          <div className="season-meta"><div><span>DIFICULTAD</span><strong>HARD</strong></div><div><span>INICIO</span><strong>19 OCT 2026</strong></div><div><span>ESTADO</span><strong className="live">EN CURSO</strong></div></div>
+          <div><div className="section-kicker">01 / TEMPORADA</div><h2>{overview?.seasonName ?? "UHC SEASON 1"}</h2><p>La temporada actual del Escuadrón Salchichón.</p></div>
+          <div className="season-meta"><div><span>DIFICULTAD</span><strong>{overview?.difficulty ?? "HARD"}</strong></div><div><span>INICIO</span><strong>{overview?.seasonStartDate ?? "2026-10-19"}</strong></div><div><span>ESTADO</span><strong className="live">EN CURSO</strong></div></div>
         </div>
       </section>
 
       <section className="stats wrap" aria-label="Estadísticas del servidor">
-        <div className="stats-heading"><div className="section-kicker">02 / EL SERVIDOR EN DATOS</div><span className="data-state"><i /> {apiConfigured ? "API CONFIGURADA" : "DATOS EN CONEXIÓN"}</span></div>
+        <div className="stats-heading"><div className="section-kicker">02 / EL SERVIDOR EN DATOS</div><span className="data-state"><i /> {overview ? "API CONECTADA" : apiConfigured ? "API SIN RESPUESTA" : "DATOS EN CONEXIÓN"}</span></div>
         <div className="stats-grid">
-          <div className="stat"><span>JUGADORES</span><strong>—</strong><small>Próximamente</small></div>
-          <div className="stat"><span>MUERTES OFICIALES</span><strong>—</strong><small>Próximamente</small></div>
-          <div className="stat"><span>HORAS JUGADAS</span><strong>—</strong><small>Próximamente</small></div>
-          <div className="stat"><span>PLAYER VALUE</span><strong>—</strong><small>Próximamente</small></div>
+          <div className="stat"><span>JUGADORES</span><strong>{overview ? overview.players.toLocaleString("es-MX") : "—"}</strong><small>{overview ? "Datos oficiales" : "Próximamente"}</small></div>
+          <div className="stat"><span>MUERTES OFICIALES</span><strong>{overview ? overview.officialDeaths.toLocaleString("es-MX") : "—"}</strong><small>{overview ? "Datos oficiales" : "Próximamente"}</small></div>
+          <div className="stat"><span>HORAS JUGADAS</span><strong>{overview ? formatPlaytime(overview.playtimeTicks) : "—"}</strong><small>{overview ? "Tiempo acumulado" : "Próximamente"}</small></div>
+          <div className="stat"><span>PLAYER VALUE</span><strong>{overview ? formatValue(overview.playerValue) : "—"}</strong><small>{overview ? "Prestigio acumulado" : "Próximamente"}</small></div>
         </div>
-        <p className="data-note">Las estadísticas aparecerán aquí cuando el servicio API esté conectado. No mostramos cifras ficticias.</p>
+        <p className="data-note">{overview ? "Información consultada desde la API oficial del servidor." : "Las estadísticas aparecerán cuando la API esté disponible. No mostramos cifras ficticias."}</p>
       </section>
 
       <section className="system-section" id="system">
@@ -72,7 +78,7 @@ export default function Home() {
 
       <section className="updates-section wrap" id="updates">
         <div><div className="section-kicker">04 / TRANSMISIONES</div><h2>LO QUE SIGUE.</h2><p>Próximas actualizaciones, cambios de temporada y anuncios oficiales.</p></div>
-        <div className="update-card"><div className="update-tag">CENTRO DE NOVEDADES</div><h3>Preparando la siguiente transmisión.</h3><p>Las notas y anuncios oficiales aparecerán aquí cuando se publiquen.</p><span className="update-arrow">↗</span></div>
+        <div className="update-card"><div className="update-tag">{latestAnnouncement?.category ?? "CENTRO DE NOVEDADES"}</div><h3>{latestAnnouncement?.title ?? "Preparando la siguiente transmisión."}</h3><p>{latestAnnouncement?.body ?? "Las notas y anuncios oficiales aparecerán aquí cuando se publiquen."}</p><span className="update-arrow">↗</span></div>
       </section>
 
       <footer className="footer"><div className="wrap footer-inner"><a className="brand" href="#"><span className="brand-mark">S</span><span>ESCUADRÓN<span className="brand-muted"> SALCHICHÓN</span></span></a><span>HECHO PARA SOBREVIVIR JUNTOS.</span><span>© 2026 · PORTAL OFICIAL</span></div></footer>

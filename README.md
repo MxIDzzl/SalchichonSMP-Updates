@@ -1,23 +1,27 @@
 # Escuadrón Salchichón — Portal oficial
 
-Este repositorio contiene la aplicación web independiente del plugin de Minecraft: portal público y punto de entrada al futuro panel administrativo.
+Este repositorio contiene dos servicios desplegables por separado:
+- `/`: portal Next.js público y futura consola administrativa.
+- `api/`: servicio Spring Boot independiente para datos públicos del servidor.
 
-## Stack
-Next.js 15 · React 19 · TypeScript.
+El plugin Paper sigue en su propio repositorio. La API y la web comparten este repositorio por ahora, pero cada una tiene su propio proceso de build y despliegue.
 
-## Desarrollo
+## Web
 Requiere Node.js 20.9+.
 ```bash
 npm install
 npm run dev
 ```
-Abre http://localhost:3000.
+Configura `SALCHICHON_API_URL` como variable de entorno del servidor Next.js (por ejemplo `http://127.0.0.1:8080`). Es una URL server-side; no colocar secretos en variables `NEXT_PUBLIC_*`.
 
-## Rutas
-- `/`: portal público, temporada, estadísticas y novedades.
-- `/admin`: entrada al área privada. Las acciones administrativas aún no están habilitadas.
+## API
+Requiere Java 25, Maven 3.9+ y PostgreSQL.
+```bash
+cd api
+mvn clean verify
+mvn spring-boot:run
+```
+Consulta `api/README.md` para endpoints, variables de entorno, CORS y permisos PostgreSQL.
 
-## Estado
-La interfaz pública ya está construida. Las estadísticas y novedades dinámicas esperan la API independiente y por ahora se muestran como no disponibles, sin cifras ficticias. El panel administrativo no modifica datos hasta implementar autenticación, autorización y auditoría en el backend.
-
-La web nunca debe conectarse directamente a PostgreSQL. No guardar secretos en variables `NEXT_PUBLIC_*`. Configurar HTTPS y limitar CORS a los dominios oficiales.
+## Seguridad y estado
+La web consulta la API desde el servidor Next.js; no se conecta directamente a PostgreSQL. La API pública es de solo lectura y debe usar un rol PostgreSQL SELECT-only. No expongas PostgreSQL a internet. El panel administrativo todavía no permite mutaciones; faltan autenticación, autorización y auditoría. La validación de licencias del plugin también está pendiente.
