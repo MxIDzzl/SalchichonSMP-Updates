@@ -6,6 +6,8 @@ const features = [
 
 const nav = [
   ["Temporada", "#season"],
+  ["Jugadores", "/players"],
+  ["Rankings", "/rankings"],
   ["Sistema", "#system"],
   ["Novedades", "#updates"],
 ];

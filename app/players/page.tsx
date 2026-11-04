@@ -1,0 +1,2 @@
+export const metadata={title:"Jugadores · Escuadrón Salchichón"};
+export default function PlayersPage(){return <main className="subpage"><a href="/">← Portal oficial</a><header><small>COMUNIDAD / DIRECTORIO</small><h1>Los jugadores.</h1><p>Perfiles, actividad y progreso de quienes forman parte de la temporada.</p></header><section className="empty"><b>DIRECTORIO EN PREPARACIÓN</b><h2>Los perfiles aparecerán aquí.</h2><p>Estamos conectando el portal con la API oficial para mostrar nombres, skins y estadísticas verificadas.</p></section></main>}
