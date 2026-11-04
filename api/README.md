@@ -16,8 +16,9 @@ Variables de entorno:
 - `SALCHICHON_WEB_ORIGINS` (orígenes separados por coma)
 - `SALCHICHON_SEASON_NAME`, `SALCHICHON_SEASON_DIFFICULTY`, `SALCHICHON_SEASON_START_DATE`
 - `SALCHICHON_API_FLYWAY_ENABLED` (por defecto false)
+- `SALCHICHON_API_MIGRATION_DB_URL`, `SALCHICHON_API_MIGRATION_DB_USER`, `SALCHICHON_API_MIGRATION_DB_PASSWORD` (credenciales separadas para ejecutar Flyway; usar un rol de despliegue con permisos DDL)
 
-Nunca usar el usuario administrador de PostgreSQL como credencial de ejecución. El rol de runtime debe tener únicamente SELECT sobre las tablas públicas. Ejecutar la migración de anuncios con una cuenta de despliegue separada; Flyway está desactivado por defecto para evitar que el usuario de solo lectura intente modificar el esquema.
+Nunca usar el usuario administrador de PostgreSQL como credencial de ejecución. El rol de runtime debe tener únicamente SELECT sobre las tablas públicas. Ejecutar la migración de anuncios con las variables `SALCHICHON_API_MIGRATION_DB_*` y una cuenta de despliegue separada. El pool de runtime permanece en modo read-only. Flyway está desactivado por defecto.
 
 ## Desarrollo
 ```bash

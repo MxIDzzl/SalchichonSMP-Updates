@@ -18,6 +18,9 @@ spring:
       connection-timeout: 10000
   flyway:
     enabled: ${SALCHICHON_API_FLYWAY_ENABLED:false}
+    url: ${SALCHICHON_API_MIGRATION_DB_URL:${SALCHICHON_API_DB_URL:jdbc:postgresql://127.0.0.1:5432/salchichon}}
+    user: ${SALCHICHON_API_MIGRATION_DB_USER:${SALCHICHON_API_DB_USER:salchichon_readonly}}
+    password: ${SALCHICHON_API_MIGRATION_DB_PASSWORD:${SALCHICHON_API_DB_PASSWORD:}}
     locations: classpath:db/migration
 
 salchichon:
