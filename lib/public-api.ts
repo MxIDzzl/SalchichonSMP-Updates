@@ -71,8 +71,18 @@ export function formatPlaytime(ticks: number) {
 }
 
 export function formatValue(value: string) {
-  return new Intl.NumberFormat("es-MX", {
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(BigInt(value));
+  const amount = BigInt(value);
+  const units = [
+    { threshold: 1_000_000_000n, suffix: "b" },
+    { threshold: 1_000_000n, suffix: "m" },
+    { threshold: 1_000n, suffix: "k" },
+  ];
+  for (const unit of units) {
+    if (amount >= unit.threshold) {
+      const whole = amount / unit.threshold;
+      const decimal = (amount % unit.threshold) * 10n / unit.threshold;
+      return `${whole}${decimal > 0n ? `.${decimal}` : ""}${unit.suffix}`;
+    }
+  }
+  return amount.toString();
 }
