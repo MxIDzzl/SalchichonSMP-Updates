@@ -2,7 +2,7 @@ name: API CI
 on:
   pull_request:
     branches: [main]
-    paths: ['api/**']
+    paths: ['api/**', '.github/workflows/api-ci.yml']
   push:
     branches: [main, feature/api-readonly-service]
     paths: ['api/**']
