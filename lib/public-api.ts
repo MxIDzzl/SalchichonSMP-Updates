@@ -16,7 +16,7 @@ export type PlayerSummary = {
   totemUses: number;
   officialDeaths: number;
   playtimeTicks: number;
-  playerValue: number;
+  playerValue: string;
 };
 
 export type Announcement = {
