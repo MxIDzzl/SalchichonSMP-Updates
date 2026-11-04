@@ -98,7 +98,7 @@ public class PublicDataRepository {
         return result != null && result == 1;
     }
 
-    private String orderBy(String sort) {
+    static String orderBy(String sort) {
         return switch (sort.toLowerCase(java.util.Locale.ROOT)) {
             case "deaths" -> "official_deaths DESC, pd.username ASC";
             case "playtime" -> "playtime_ticks DESC, pd.username ASC";
