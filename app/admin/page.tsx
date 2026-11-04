@@ -1,3 +1,4 @@
+import Link from "next/link";
 export const metadata = { title: "Administración · Escuadrón Salchichón" };
 
 export default function AdminPage() {
@@ -5,7 +6,7 @@ export default function AdminPage() {
 
   return (
     <main className="admin-page">
-      <a className="back-link" href="/">← Volver al portal</a>
+      <Link className="back-link" href="/">← Volver al portal</Link>
       <div className="admin-panel">
         <div className="section-kicker">ÁREA PRIVADA / ADMINISTRACIÓN</div>
         <div className="admin-symbol">S</div>
@@ -16,7 +17,7 @@ export default function AdminPage() {
           {configured ? "URL de API configurada; autenticación pendiente de integración." : "API no conectada"}
         </div>
         <div className="admin-warning">El panel todavía no permite modificar datos. No se simula una sesión ni se guardan credenciales en el navegador.</div>
-        <a className="text-link" href="/">Regresar al sitio público →</a>
+        <Link className="text-link" href="/">Regresar al sitio público →</Link>
       </div>
     </main>
   );
