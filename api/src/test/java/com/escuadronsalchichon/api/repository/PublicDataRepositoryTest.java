@@ -27,4 +27,13 @@ class PublicDataRepositoryTest {
         assertEquals("player_value DESC, pd.uuid ASC",
                 PublicDataRepository.orderBy("value DESC; DROP TABLE player_data"));
     }
+    @Test
+    void onlyExposesValidatedSkinTextureHashes() {
+        assertEquals("abcdef0123456789abcdef0123456789",
+                PublicDataRepository.normalizeSkinTextureHash("ABCDEF0123456789ABCDEF0123456789"));
+        assertEquals(null, PublicDataRepository.normalizeSkinTextureHash(null));
+        assertEquals(null, PublicDataRepository.normalizeSkinTextureHash("not-a-texture-url"));
+        assertEquals(null, PublicDataRepository.normalizeSkinTextureHash("abcdef"));
+    }
+
 }
