@@ -5,7 +5,7 @@ Servicio Spring Boot independiente y de solo lectura para el portal público. Se
 ## Requisitos
 - Java 25
 - Maven 3.9+
-- PostgreSQL con el esquema v1-v4 del plugin aplicado y migraciones API aplicadas
+- PostgreSQL con el esquema v1-v5 del plugin aplicado y migraciones API aplicadas
 - Rol PostgreSQL de solo lectura para el runtime de la API
 
 ## Configuración
@@ -42,3 +42,7 @@ La migración V2 añade `scheduled_at` y `is_teaser` a `public_announcements`. E
 
 ## Estado de seguridad
 Esta primera entrega es estrictamente de lectura pública. No incluye rutas administrativas, autenticación de administradores ni validación de licencias de plugin. Esas rutas no deben añadirse hasta definir y probar autenticación, autorización, rotación/revocación de tokens y auditoría. No abrir PostgreSQL a internet; exponer solo HTTPS de la API.
+
+## Skins de jugadores
+
+La migración API V3 crea la tabla compartida `player_skins`. El plugin Paper, cuando detecta SkinsRestorer API major 15, sincroniza de forma asíncrona únicamente el hash público de textura del perfil del jugador. La API devuelve ese campo como `skinTextureHash` en los perfiles y directorios. No se guardan firmas completas, credenciales ni propiedades privadas de SkinsRestorer. Los perfiles sin hash permanecen sin avatar; nunca se inventa una skin.
