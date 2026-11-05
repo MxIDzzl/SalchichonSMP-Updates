@@ -6,6 +6,7 @@ import java.util.UUID;
 public record PlayerSummaryResponse(
         UUID uuid,
         String username,
+        String skinTextureHash,
         LocalDate lastDeathDate,
         boolean hasLife,
         long totemUses,
