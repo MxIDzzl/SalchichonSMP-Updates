@@ -14,6 +14,15 @@ npm run dev
 ```
 Configura `SALCHICHON_API_URL` como variable de entorno del servidor Next.js (por ejemplo `http://127.0.0.1:8080`). Es una URL server-side; no colocar secretos en variables `NEXT_PUBLIC_*`.
 
+## Despliegue independiente de la web
+
+La web incluye un Dockerfile multi-stage y se ejecuta como proceso independiente:
+```bash
+docker build -t salchichon-web .
+docker run --rm -p 3000:3000 -e SALCHICHON_API_URL=http://host.docker.internal:8080 salchichon-web
+```
+En Linux, configura la dirección privada real de la API en `SALCHICHON_API_URL`; no publiques esta variable como `NEXT_PUBLIC_*`. Termina TLS en un proxy inverso y limita el acceso de red entre web y API.
+
 ## API
 Requiere Java 25, Maven 3.9+ y PostgreSQL.
 ```bash
