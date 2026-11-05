@@ -128,10 +128,10 @@ public class PublicDataRepository {
 
     static String orderBy(String sort) {
         return switch (sort.toLowerCase(java.util.Locale.ROOT)) {
-            case "deaths" -> "official_deaths DESC, pd.username ASC";
-            case "playtime" -> "playtime_ticks DESC, pd.username ASC";
-            case "totems" -> "pd.totem_uses DESC, pd.username ASC";
-            default -> "player_value DESC, pd.username ASC";
+            case "deaths" -> "official_deaths DESC, pd.uuid ASC";
+            case "playtime" -> "playtime_ticks DESC, pd.uuid ASC";
+            case "totems" -> "pd.totem_uses DESC, pd.uuid ASC";
+            default -> "player_value DESC, pd.uuid ASC";
         };
     }
 
