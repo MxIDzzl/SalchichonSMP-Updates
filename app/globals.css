@@ -22,3 +22,8 @@
 .skin-avatar-empty.small{width:34px;height:34px;border-radius:8px}
 .player-name-cell{display:flex;align-items:center;gap:11px;min-width:0}
 @media(max-width:650px){.skin-avatar{width:56px;height:56px}.profile-heading{gap:12px}}
+
+.directory-pagination{display:flex;align-items:center;justify-content:space-between;gap:14px;max-width:920px;margin-top:16px;color:#a99fb4;font:11px var(--mono)}
+.directory-pagination a{color:#ff8fa3;padding:10px 14px;border:1px solid var(--line);border-radius:10px}
+.directory-pagination a:hover{background:#211a2a;border-color:rgba(255,143,163,.4)}
+@media(max-width:650px){.directory-pagination{font-size:10px}.directory-pagination a{padding:9px 10px}}
