@@ -1,5 +1,7 @@
 package com.escuadronsalchichon.api.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -26,14 +28,17 @@ public class AdminAnnouncementController {
     private final JdbcTemplate jdbc;
     private final TransactionTemplate transaction;
     private final String actor;
+    private final ObjectMapper objectMapper;
 
     public AdminAnnouncementController(
             @Qualifier("adminJdbcTemplate") JdbcTemplate jdbc,
             @Qualifier("adminTransactionManager") PlatformTransactionManager transactionManager,
-            @Value("${salchichon.admin.actor:configured-admin}") String actor) {
+            @Value("${salchichon.admin.actor:configured-admin}") String actor,
+            ObjectMapper objectMapper) {
         this.jdbc = jdbc;
         this.transaction = new TransactionTemplate(transactionManager);
         this.actor = actor;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping
@@ -119,9 +124,11 @@ public class AdminAnnouncementController {
     }
 
     private String toJson(Map<String, Object> values) {
-        return values.entrySet().stream()
-                .map(entry -> "\"" + entry.getKey() + "\":" + entry.getValue())
-                .collect(java.util.stream.Collectors.joining(",", "{", "}"));
+        try {
+            return objectMapper.writeValueAsString(values);
+        } catch (JsonProcessingException exception) {
+            throw new IllegalArgumentException("Could not serialize admin audit details", exception);
+        }
     }
 
     public record CreateAnnouncement(
