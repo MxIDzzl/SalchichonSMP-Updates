@@ -18,6 +18,7 @@ GRANT SELECT (uuid, username) ON TABLE player_data TO salchichon_admin;
 GRANT INSERT ON TABLE player_stats TO salchichon_admin;
 GRANT SELECT (player_uuid, official_deaths, playtime_ticks)
     ON TABLE player_stats TO salchichon_admin;
+-- player_uuid is also required by the admin controller's WHERE and conflict checks.
 GRANT UPDATE (official_deaths, playtime_ticks, updated_at)
     ON TABLE player_stats TO salchichon_admin;
 GRANT INSERT ON TABLE stat_events TO salchichon_admin;
