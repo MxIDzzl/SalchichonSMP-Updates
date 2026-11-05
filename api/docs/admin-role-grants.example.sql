@@ -3,6 +3,12 @@
 -- Run as a database owner after plugin schema v1-v6 and API migrations V1-V4.
 -- Do not grant this role membership in the plugin runtime or migration roles.
 
+-- Identity columns require sequence privileges when INSERT omits the generated ID.
+-- Keep these grants limited to the three sequences used by the admin writers.
+GRANT USAGE, SELECT ON SEQUENCE public_announcements_id_seq TO salchichon_admin;
+GRANT USAGE, SELECT ON SEQUENCE public_admin_audit_id_seq TO salchichon_admin;
+GRANT USAGE, SELECT ON SEQUENCE stat_events_id_seq TO salchichon_admin;
+
 -- Public announcement administration.
 GRANT SELECT, INSERT, UPDATE ON TABLE public_announcements TO salchichon_admin;
 GRANT SELECT, INSERT ON TABLE public_admin_audit TO salchichon_admin;
