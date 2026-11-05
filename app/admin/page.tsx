@@ -2,7 +2,7 @@ import Link from "next/link";
 export const metadata = { title: "Administración · Escuadrón Salchichón" };
 
 export default function AdminPage() {
-  const configured = Boolean(process.env.NEXT_PUBLIC_SALCHICHON_API_URL);
+  const configured = Boolean(process.env.SALCHICHON_API_URL);
 
   return (
     <main className="admin-page">
