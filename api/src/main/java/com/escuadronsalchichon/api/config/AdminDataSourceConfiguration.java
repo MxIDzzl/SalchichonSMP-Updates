@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -37,12 +38,12 @@ public class AdminDataSourceConfiguration {
     }
 
     @Bean(name = "adminJdbcTemplate")
-    public JdbcTemplate adminJdbcTemplate(DataSource adminDataSource) {
+    public JdbcTemplate adminJdbcTemplate(@Qualifier("adminDataSource") DataSource adminDataSource) {
         return new JdbcTemplate(adminDataSource);
     }
 
     @Bean(name = "adminTransactionManager")
-    public PlatformTransactionManager adminTransactionManager(DataSource adminDataSource) {
+    public PlatformTransactionManager adminTransactionManager(@Qualifier("adminDataSource") DataSource adminDataSource) {
         return new DataSourceTransactionManager(adminDataSource);
     }
 }
