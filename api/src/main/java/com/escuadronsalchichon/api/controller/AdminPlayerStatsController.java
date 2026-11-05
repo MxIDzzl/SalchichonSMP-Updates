@@ -45,7 +45,7 @@ public class AdminPlayerStatsController {
         if (column == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported statistic");
 
         Long eventId = transaction.execute(status -> {
-            var player = jdbc.query("SELECT uuid FROM player_data WHERE uuid = ? FOR UPDATE",
+            var player = jdbc.query("SELECT uuid FROM player_data WHERE uuid = ?",
                     (rs, row) -> rs.getObject(1, UUID.class), uuid);
             if (player.isEmpty()) return null;
 
