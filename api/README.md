@@ -63,7 +63,7 @@ Inspección de recuperación de trades:
 - Nunca devuelve el payload serializado de los ítems ni ofrece una acción de entrega/cancelación forzada. La resolución requiere verificar inventario y marcadores PDC dentro del servidor, no inferirla desde el panel.
 
 ### Permisos PostgreSQL del rol administrativo
-Limitar el rol a lo estrictamente necesario:
+Limitar el rol a lo estrictamente necesario. Hay un ejemplo ejecutable de permisos por tabla/columna en [`docs/admin-role-grants.example.sql`](docs/admin-role-grants.example.sql); reemplazar el nombre de rol y ejecutarlo como propietario de la base de datos:
 - SELECT sobre `player_data`, `player_stats` y `trade_sessions`.
 - SELECT **solo por columnas** en `trade_item_operations`: `operation_id`, `trade_id`, `owner_uuid`, `recipient_uuid`, `item_fingerprint`, `status`, `created_at`, `updated_at` y `delivered_at`. No conceder SELECT sobre `item_payload`; el endpoint no necesita ni devuelve ese contenido.
 - INSERT/UPDATE sobre `public_announcements`.
