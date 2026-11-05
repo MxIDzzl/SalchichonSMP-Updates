@@ -1,5 +1,6 @@
 import Link from "next/link";
-export const metadata = { title: "Administración · Escuadrón Salchichón" };
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Administración · Escuadrón Salchichón", robots: { index: false, follow: false } };
 
 export default function AdminPage() {
   const configured = Boolean(process.env.SALCHICHON_API_URL);
