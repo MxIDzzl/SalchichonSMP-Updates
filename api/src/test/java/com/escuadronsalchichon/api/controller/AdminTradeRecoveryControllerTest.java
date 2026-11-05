@@ -13,6 +13,18 @@ class AdminTradeRecoveryControllerTest {
     }
 
     @Test
+    void recoveryQueryExposesFingerprintsButNeverSelectsSerializedPayloads() {
+        String query = AdminTradeRecoveryController.RECOVERY_QUERY;
+        assertTrue(query.contains("o.item_fingerprint"));
+        assertFalse(query.contains("o.item_payload"));
+        assertTrue(query.contains("'PREPARED'"));
+        assertTrue(query.contains("'DELIVERY_PENDING'"));
+        assertTrue(query.contains("'DELIVERING'"));
+        assertTrue(query.contains("'RETURN_PENDING'"));
+        assertTrue(query.contains("'RECOVERY_REQUIRED'"));
+    }
+
+    @Test
     void rejectsUnboundedOrInvalidPagination() {
         assertThrows(ResponseStatusException.class,
                 () -> AdminTradeRecoveryController.validatePagination(0, 0));
