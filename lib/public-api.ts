@@ -13,6 +13,7 @@ export type Overview = {
 export type PlayerSummary = {
   uuid: string;
   username: string;
+  skinTextureHash: string | null;
   lastDeathDate: string | null;
   hasLife: boolean;
   totemUses: number;
