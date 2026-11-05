@@ -2,6 +2,7 @@ package com.escuadronsalchichon.api.repository;
 
 import com.escuadronsalchichon.api.dto.AnnouncementResponse;
 import com.escuadronsalchichon.api.dto.PlayerSummaryResponse;
+import com.escuadronsalchichon.api.dto.UpcomingUpdateResponse;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -91,6 +92,27 @@ public class PublicDataRepository {
                 rs.getObject("published_at", java.time.OffsetDateTime.class),
                 rs.getObject("expires_at", java.time.OffsetDateTime.class)
         ), limit);
+    }
+
+    public Optional<UpcomingUpdateResponse> findUpcomingUpdate() {
+        List<UpcomingUpdateResponse> updates = jdbc.query("""
+                SELECT id, title, body, category, scheduled_at, is_teaser
+                FROM public_announcements
+                WHERE is_published = TRUE
+                  AND scheduled_at IS NOT NULL
+                  AND scheduled_at > now()
+                  AND (expires_at IS NULL OR expires_at > now())
+                ORDER BY scheduled_at ASC, id ASC
+                LIMIT 1
+                """, (rs, row) -> new UpcomingUpdateResponse(
+                rs.getLong("id"),
+                rs.getString("title"),
+                rs.getString("body"),
+                rs.getString("category"),
+                rs.getObject("scheduled_at", java.time.OffsetDateTime.class),
+                rs.getBoolean("is_teaser")
+        ));
+        return updates.stream().findFirst();
     }
 
     public boolean databaseReady() {

@@ -5,7 +5,7 @@ Servicio Spring Boot independiente y de solo lectura para el portal público. Se
 ## Requisitos
 - Java 25
 - Maven 3.9+
-- PostgreSQL con el esquema v1-v4 del plugin aplicado
+- PostgreSQL con el esquema v1-v4 del plugin aplicado y migraciones API aplicadas
 - Rol PostgreSQL de solo lectura para el runtime de la API
 
 ## Configuración
@@ -14,11 +14,11 @@ Variables de entorno:
 - `SALCHICHON_API_DB_USER`
 - `SALCHICHON_API_DB_PASSWORD`
 - `SALCHICHON_WEB_ORIGINS` (orígenes separados por coma)
-- `SALCHICHON_SEASON_NAME`, `SALCHICHON_SEASON_DIFFICULTY`, `SALCHICHON_SEASON_START_DATE`
+- `SALCHICHON_SEASON_NAME`, `SALCHICHON_SEASON_DESCRIPTION`, `SALCHICHON_SEASON_DIFFICULTY`, `SALCHICHON_SEASON_START_DATE`
 - `SALCHICHON_API_FLYWAY_ENABLED` (por defecto false)
 - `SALCHICHON_API_MIGRATION_DB_URL`, `SALCHICHON_API_MIGRATION_DB_USER`, `SALCHICHON_API_MIGRATION_DB_PASSWORD` (credenciales separadas para ejecutar Flyway; usar un rol de despliegue con permisos DDL)
 
-Nunca usar el usuario administrador de PostgreSQL como credencial de ejecución. El rol de runtime debe tener únicamente SELECT sobre las tablas públicas. Ejecutar la migración de anuncios con las variables `SALCHICHON_API_MIGRATION_DB_*` y una cuenta de despliegue separada. El pool de runtime permanece en modo read-only. Flyway está desactivado por defecto.
+Nunca usar el usuario administrador de PostgreSQL como credencial de ejecución. El rol de runtime debe tener únicamente SELECT sobre las tablas públicas. Ejecutar las migraciones con las variables `SALCHICHON_API_MIGRATION_DB_*` y una cuenta de despliegue separada. El pool de runtime permanece en modo read-only. Flyway está desactivado por defecto.
 
 ## Desarrollo
 ```bash
@@ -33,8 +33,12 @@ mvn spring-boot:run
 - `GET /api/v1/public/players?limit=20&offset=0&sort=value`
 - `GET /api/v1/public/players/{uuid}`
 - `GET /api/v1/public/announcements?limit=10`
+- `GET /api/v1/public/upcoming-update` (404 when no future update is published)
 
 Sort permitido: `value`, `deaths`, `playtime`, `totems`. Paginación limitada a 100 registros. No se aceptan escrituras públicas.
+
+## Novedades programadas
+La migración V2 añade `scheduled_at` y `is_teaser` a `public_announcements`. El endpoint upcoming devuelve la siguiente publicación futura marcada como publicada, respetando `expires_at`. Los teasers deben marcarse explícitamente como tales; nunca se infiere que un anuncio es filtración por su título.
 
 ## Estado de seguridad
 Esta primera entrega es estrictamente de lectura pública. No incluye rutas administrativas, autenticación de administradores ni validación de licencias de plugin. Esas rutas no deben añadirse hasta definir y probar autenticación, autorización, rotación/revocación de tokens y auditoría. No abrir PostgreSQL a internet; exponer solo HTTPS de la API.

@@ -28,5 +28,6 @@ salchichon:
     allowed-origins: ${SALCHICHON_WEB_ORIGINS:http://localhost:3000}
   season:
     name: ${SALCHICHON_SEASON_NAME:UHC SEASON 1}
+    description: ${SALCHICHON_SEASON_DESCRIPTION:Una temporada de supervivencia donde cada decisión tiene consecuencias.}
     difficulty: ${SALCHICHON_SEASON_DIFFICULTY:HARD}
     start-date: ${SALCHICHON_SEASON_START_DATE:2026-10-19}

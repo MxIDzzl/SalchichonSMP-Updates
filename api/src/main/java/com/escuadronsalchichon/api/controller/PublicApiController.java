@@ -3,6 +3,7 @@ package com.escuadronsalchichon.api.controller;
 import com.escuadronsalchichon.api.dto.AnnouncementResponse;
 import com.escuadronsalchichon.api.dto.OverviewResponse;
 import com.escuadronsalchichon.api.dto.PlayerSummaryResponse;
+import com.escuadronsalchichon.api.dto.UpcomingUpdateResponse;
 import com.escuadronsalchichon.api.repository.PublicDataRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -22,17 +23,20 @@ import java.util.UUID;
 public class PublicApiController {
     private final PublicDataRepository repository;
     private final String seasonName;
+    private final String seasonDescription;
     private final String difficulty;
     private final String seasonStartDate;
 
     public PublicApiController(
             PublicDataRepository repository,
             @Value("${salchichon.season.name:UHC SEASON 1}") String seasonName,
+            @Value("${salchichon.season.description:Una temporada de supervivencia donde cada decisión tiene consecuencias.}") String seasonDescription,
             @Value("${salchichon.season.difficulty:HARD}") String difficulty,
             @Value("${salchichon.season.start-date:2026-10-19}") String seasonStartDate
     ) {
         this.repository = repository;
         this.seasonName = seasonName;
+        this.seasonDescription = seasonDescription;
         this.difficulty = difficulty;
         this.seasonStartDate = seasonStartDate;
     }
@@ -41,7 +45,7 @@ public class PublicApiController {
     public OverviewResponse overview() {
         PublicDataRepository.OverviewTotals totals = repository.overviewTotals();
         return new OverviewResponse(totals.players(), totals.officialDeaths(), totals.playtimeTicks(),
-                totals.playerValue(), seasonName, difficulty, seasonStartDate, Instant.now());
+                totals.playerValue(), seasonName, seasonDescription, difficulty, seasonStartDate, Instant.now());
     }
 
     @GetMapping("/public/players")
@@ -64,6 +68,12 @@ public class PublicApiController {
     public List<AnnouncementResponse> announcements(@RequestParam(defaultValue = "10") int limit) {
         validatePage(limit, 0);
         return repository.findAnnouncements(limit);
+    }
+
+    @GetMapping("/public/upcoming-update")
+    public UpcomingUpdateResponse upcomingUpdate() {
+        return repository.findUpcomingUpdate()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No upcoming update"));
     }
 
     private void validatePage(int limit, int offset) {

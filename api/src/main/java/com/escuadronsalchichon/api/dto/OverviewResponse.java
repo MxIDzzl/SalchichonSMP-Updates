@@ -8,6 +8,7 @@ public record OverviewResponse(
         long playtimeTicks,
         String playerValue,
         String seasonName,
+        String seasonDescription,
         String difficulty,
         String seasonStartDate,
         Instant generatedAt
