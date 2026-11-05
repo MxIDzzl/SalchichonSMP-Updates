@@ -37,3 +37,4 @@ salchichon:
   admin:
     enabled: ${SALCHICHON_ADMIN_ENABLED:false}
     token: ${SALCHICHON_ADMIN_TOKEN:}
+    actor: ${SALCHICHON_ADMIN_ACTOR:configured-admin}
