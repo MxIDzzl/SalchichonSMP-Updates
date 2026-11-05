@@ -53,7 +53,9 @@ La migración API V3 crea la tabla compartida `player_skins`. El plugin Paper, c
 
 La API incorpora una primera superficie administrativa para anuncios, desactivada por defecto. No es todavía el panel web completo ni autenticación multiusuario.
 
+- `GET /api/v1/admin/announcements?limit=50&offset=0`: lista anuncios, incluidos borradores.
 - `POST /api/v1/admin/announcements`: crea un anuncio o teaser, como borrador o publicado.
+- `PUT /api/v1/admin/announcements/{id}`: edita título, cuerpo, categoría, programación, expiración y estado teaser.
 - `PATCH /api/v1/admin/announcements/{id}/publication`: publica o despublica un anuncio existente.
 - `GET /api/v1/admin/audit?limit=50&offset=0`: consulta el registro de auditoría.
 
