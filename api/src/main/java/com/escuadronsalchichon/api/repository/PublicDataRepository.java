@@ -64,7 +64,7 @@ public class PublicDataRepository {
 
     private PlayerSummaryResponse mapPlayer(ResultSet rs, LocalDate today) throws SQLException {
         LocalDate lastDeathDate = rs.getObject("last_death_date", LocalDate.class);
-        boolean hasLife = lastDeathDate == null || lastDeathDate.isBefore(today);
+        boolean hasLife = hasLifeOn(lastDeathDate, today);
         return new PlayerSummaryResponse(
                 rs.getObject("uuid", UUID.class),
                 rs.getString("username"),
@@ -120,6 +120,10 @@ public class PublicDataRepository {
     public boolean databaseReady() {
         Integer result = jdbc.queryForObject("SELECT 1", Integer.class);
         return result != null && result == 1;
+    }
+
+    static boolean hasLifeOn(LocalDate lastDeathDate, LocalDate today) {
+        return lastDeathDate == null || lastDeathDate.isBefore(today);
     }
 
     static String orderBy(String sort) {

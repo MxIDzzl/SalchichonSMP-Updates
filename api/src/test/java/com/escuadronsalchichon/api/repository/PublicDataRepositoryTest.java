@@ -6,6 +6,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PublicDataRepositoryTest {
     @Test
+    void lifeAvailabilityUsesTheConfiguredServerDate() {
+        var today = java.time.LocalDate.of(2026, 11, 4);
+        assertEquals(true, PublicDataRepository.hasLifeOn(null, today));
+        assertEquals(true, PublicDataRepository.hasLifeOn(today.minusDays(1), today));
+        assertEquals(false, PublicDataRepository.hasLifeOn(today, today));
+        assertEquals(false, PublicDataRepository.hasLifeOn(today.plusDays(1), today));
+    }
+
+    @Test
     void usesOnlyAllowlistedSortExpressions() {
         assertEquals("player_value DESC, pd.username ASC", PublicDataRepository.orderBy("value"));
         assertEquals("official_deaths DESC, pd.username ASC", PublicDataRepository.orderBy("deaths"));
