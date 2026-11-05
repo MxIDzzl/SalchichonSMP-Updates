@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatPlaytime, formatValue, getAnnouncements, getOverview } from "@/lib/public-api";
+import { formatDate, formatPlaytime, formatValue, getAnnouncements, getOverview, getUpcomingUpdate } from "@/lib/public-api";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +18,7 @@ const nav = [
 ];
 
 export default async function Home() {
-  const [overview, announcements] = await Promise.all([getOverview(), getAnnouncements(1)]);
+  const [overview, announcements, upcomingUpdate] = await Promise.all([getOverview(), getAnnouncements(1), getUpcomingUpdate()]);
   const apiConfigured = Boolean(process.env.SALCHICHON_API_URL);
   const latestAnnouncement = announcements?.[0];
 
@@ -52,7 +52,7 @@ export default async function Home() {
 
       <section className="season-band" id="season">
         <div className="wrap season-inner">
-          <div><div className="section-kicker">01 / TEMPORADA</div><h2>{overview?.seasonName ?? "UHC SEASON 1"}</h2><p>La temporada actual del Escuadrón Salchichón.</p></div>
+          <div><div className="section-kicker">01 / TEMPORADA</div><h2>{overview?.seasonName ?? "UHC SEASON 1"}</h2><p>{overview?.seasonDescription ?? "La temporada actual del Escuadrón Salchichón."}</p></div>
           <div className="season-meta"><div><span>DIFICULTAD</span><strong>{overview?.difficulty ?? "HARD"}</strong></div><div><span>INICIO</span><strong>{overview?.seasonStartDate ?? "2026-10-19"}</strong></div><div><span>ESTADO</span><strong className="live">EN CURSO</strong></div></div>
         </div>
       </section>
@@ -78,7 +78,7 @@ export default async function Home() {
 
       <section className="updates-section wrap" id="updates">
         <div><div className="section-kicker">04 / TRANSMISIONES</div><h2>LO QUE SIGUE.</h2><p>Próximas actualizaciones, cambios de temporada y anuncios oficiales.</p></div>
-        <div className="update-card"><div className="update-tag">{latestAnnouncement?.category ?? "CENTRO DE NOVEDADES"}</div><h3>{latestAnnouncement?.title ?? "Preparando la siguiente transmisión."}</h3><p>{latestAnnouncement?.body ?? "Las notas y anuncios oficiales aparecerán aquí cuando se publiquen."}</p><span className="update-arrow">↗</span></div>
+        <div className="updates-cards"><article className="update-card"><div className="update-tag">{latestAnnouncement?.category ?? "ÚLTIMO ANUNCIO"}</div><h3>{latestAnnouncement?.title ?? "Preparando la siguiente transmisión."}</h3><p>{latestAnnouncement?.body ?? "Las notas y anuncios oficiales aparecerán aquí cuando se publiquen."}</p><span className="update-arrow">↗</span></article>{upcomingUpdate && <article className="update-card upcoming-card"><div className="update-tag">{upcomingUpdate.teaser ? "ADELANTO · " : "PRÓXIMA ACTUALIZACIÓN · "}{upcomingUpdate.category}</div><h3>{upcomingUpdate.title}</h3><p>{upcomingUpdate.body}</p><small>PROGRAMADA PARA {formatDate(upcomingUpdate.scheduledAt).toUpperCase()}</small><span className="update-arrow">↗</span></article>}</div>
       </section>
 
       <footer className="footer"><div className="wrap footer-inner"><a className="brand" href="#"><span className="brand-mark">S</span><span>ESCUADRÓN<span className="brand-muted"> SALCHICHÓN</span></span></a><span>HECHO PARA SOBREVIVIR JUNTOS.</span><span>© 2026 · PORTAL OFICIAL</span></div></footer>

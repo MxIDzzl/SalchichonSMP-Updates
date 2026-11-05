@@ -4,6 +4,7 @@ export type Overview = {
   playtimeTicks: number;
   playerValue: string;
   seasonName: string;
+  seasonDescription: string;
   difficulty: string;
   seasonStartDate: string;
   generatedAt: string;
@@ -26,6 +27,16 @@ export type Announcement = {
   category: string;
   publishedAt: string;
   expiresAt: string | null;
+};
+
+
+export type UpcomingUpdate = {
+  id: number;
+  title: string;
+  body: string;
+  category: string;
+  scheduledAt: string;
+  teaser: boolean;
 };
 
 async function apiGet<T>(path: string): Promise<T | null> {
@@ -60,6 +71,14 @@ export function getPlayer(uuid: string) {
 
 export function getAnnouncements(limit = 5) {
   return apiGet<Announcement[]>(`/public/announcements?limit=${limit}`);
+}
+
+export function getUpcomingUpdate() {
+  return apiGet<UpcomingUpdate>(`/public/upcoming-update`);
+}
+
+export function formatDate(value: string) {
+  return new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date(value));
 }
 
 export function formatPlaytime(ticks: number) {
