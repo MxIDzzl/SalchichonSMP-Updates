@@ -12,7 +12,10 @@ export default async function PlayersPage() {
     {players && players.length > 0 ? <section className="player-table">
       <div className="player-table-head"><span>JUGADOR</span><span>PLAYER VALUE</span><span>MUERTES</span><span>TIEMPO</span><span>ESTADO</span></div>
       {players.map(player => <Link className="player-row" href={`/players/${player.uuid}`} key={player.uuid}>
-        <strong>{player.username}</strong><span>{formatValue(player.playerValue)}</span><span>{player.officialDeaths}</span><span>{formatPlaytime(player.playtimeTicks)}</span><span className={player.hasLife ? "life-available" : "life-unavailable"}>{player.hasLife ? "VIDA" : "SIN VIDA"}</span>
+        <span className="player-name-cell">
+          {player.skinTextureHash ? <img className="skin-avatar-small" src={`https://mc-heads.net/avatar/${player.skinTextureHash}/48`} alt="" loading="lazy" /> : <span className="skin-avatar-empty small" aria-hidden="true" />}
+          <strong>{player.username}</strong>
+        </span><span>{formatValue(player.playerValue)}</span><span>{player.officialDeaths}</span><span>{formatPlaytime(player.playtimeTicks)}</span><span className={player.hasLife ? "life-available" : "life-unavailable"}>{player.hasLife ? "VIDA" : "SIN VIDA"}</span>
       </Link>)}
     </section> : <section className="empty"><b>DIRECTORIO EN PREPARACIÓN</b><h2>Los perfiles aparecerán aquí.</h2><p>Cuando la API esté conectada y haya datos disponibles, verás nombres, skins y estadísticas verificadas.</p></section>}
   </main>;
