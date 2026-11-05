@@ -124,8 +124,13 @@ public class AdminAnnouncementController {
     }
 
     private String toJson(Map<String, Object> values) {
+        return serializeAuditDetails(values, objectMapper);
+    }
+
+
+    static String serializeAuditDetails(Map<String, Object> values, ObjectMapper mapper) {
         try {
-            return objectMapper.writeValueAsString(values);
+            return mapper.writeValueAsString(values);
         } catch (JsonProcessingException exception) {
             throw new IllegalArgumentException("Could not serialize admin audit details", exception);
         }
