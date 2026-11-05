@@ -6,6 +6,9 @@ import com.escuadronsalchichon.api.dto.UpcomingUpdateResponse;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,7 +34,7 @@ public class PublicDataRepository {
         ));
     }
 
-    public List<PlayerSummaryResponse> findPlayers(int limit, int offset, String sort) {
+    public List<PlayerSummaryResponse> findPlayers(int limit, int offset, String sort, LocalDate today) {
         String orderBy = orderBy(sort);
         String sql = """
                 SELECT pd.uuid, pd.username, pd.last_death_date, pd.totem_uses,
@@ -43,18 +46,10 @@ public class PublicDataRepository {
                 ORDER BY %s
                 LIMIT ? OFFSET ?
                 """.formatted(orderBy);
-        return jdbc.query(sql, (rs, row) -> new PlayerSummaryResponse(
-                rs.getObject("uuid", UUID.class),
-                rs.getString("username"),
-                rs.getObject("last_death_date", java.time.LocalDate.class),
-                rs.getLong("totem_uses"),
-                rs.getLong("official_deaths"),
-                rs.getLong("playtime_ticks"),
-                rs.getBigDecimal("player_value").toPlainString()
-        ), limit, offset);
+        return jdbc.query(sql, (rs, row) -> mapPlayer(rs, today), limit, offset);
     }
 
-    public Optional<PlayerSummaryResponse> findPlayer(UUID uuid) {
+    public Optional<PlayerSummaryResponse> findPlayer(UUID uuid, LocalDate today) {
         List<PlayerSummaryResponse> rows = jdbc.query("""
                 SELECT pd.uuid, pd.username, pd.last_death_date, pd.totem_uses,
                        COALESCE(ps.official_deaths, 0) AS official_deaths,
@@ -63,16 +58,23 @@ public class PublicDataRepository {
                 FROM player_data pd
                 LEFT JOIN player_stats ps ON ps.player_uuid = pd.uuid
                 WHERE pd.uuid = ?
-                """, (rs, row) -> new PlayerSummaryResponse(
+                """, (rs, row) -> mapPlayer(rs, today), uuid);
+        return rows.stream().findFirst();
+    }
+
+    private PlayerSummaryResponse mapPlayer(ResultSet rs, LocalDate today) throws SQLException {
+        LocalDate lastDeathDate = rs.getObject("last_death_date", LocalDate.class);
+        boolean hasLife = lastDeathDate == null || lastDeathDate.isBefore(today);
+        return new PlayerSummaryResponse(
                 rs.getObject("uuid", UUID.class),
                 rs.getString("username"),
-                rs.getObject("last_death_date", java.time.LocalDate.class),
+                lastDeathDate,
+                hasLife,
                 rs.getLong("totem_uses"),
                 rs.getLong("official_deaths"),
                 rs.getLong("playtime_ticks"),
                 rs.getBigDecimal("player_value").toPlainString()
-        ), uuid);
-        return rows.stream().findFirst();
+        );
     }
 
     public List<AnnouncementResponse> findAnnouncements(int limit) {

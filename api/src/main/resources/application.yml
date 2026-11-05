@@ -31,3 +31,5 @@ salchichon:
     description: ${SALCHICHON_SEASON_DESCRIPTION:Una temporada de supervivencia donde cada decisión tiene consecuencias.}
     difficulty: ${SALCHICHON_SEASON_DIFFICULTY:HARD}
     start-date: ${SALCHICHON_SEASON_START_DATE:2026-10-19}
+  server:
+    timezone: ${SALCHICHON_SERVER_TIMEZONE:America/Mexico_City}

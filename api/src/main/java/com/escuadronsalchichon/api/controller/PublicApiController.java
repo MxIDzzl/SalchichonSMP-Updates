@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,19 +28,22 @@ public class PublicApiController {
     private final String seasonDescription;
     private final String difficulty;
     private final String seasonStartDate;
+    private final ZoneId serverZone;
 
     public PublicApiController(
             PublicDataRepository repository,
             @Value("${salchichon.season.name:UHC SEASON 1}") String seasonName,
             @Value("${salchichon.season.description:Una temporada de supervivencia donde cada decisión tiene consecuencias.}") String seasonDescription,
             @Value("${salchichon.season.difficulty:HARD}") String difficulty,
-            @Value("${salchichon.season.start-date:2026-10-19}") String seasonStartDate
+            @Value("${salchichon.season.start-date:2026-10-19}") String seasonStartDate,
+            @Value("${salchichon.server.timezone:America/Mexico_City}") String serverTimezone
     ) {
         this.repository = repository;
         this.seasonName = seasonName;
         this.seasonDescription = seasonDescription;
         this.difficulty = difficulty;
         this.seasonStartDate = seasonStartDate;
+        this.serverZone = ZoneId.of(serverTimezone);
     }
 
     @GetMapping("/public/overview")
@@ -55,12 +60,12 @@ public class PublicApiController {
             @RequestParam(defaultValue = "value") String sort
     ) {
         validatePage(limit, offset);
-        return repository.findPlayers(limit, offset, sort);
+        return repository.findPlayers(limit, offset, sort, LocalDate.now(serverZone));
     }
 
     @GetMapping("/public/players/{uuid}")
     public PlayerSummaryResponse player(@PathVariable UUID uuid) {
-        return repository.findPlayer(uuid)
+        return repository.findPlayer(uuid, LocalDate.now(serverZone))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
     }
 

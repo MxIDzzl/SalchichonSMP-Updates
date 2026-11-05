@@ -7,6 +7,7 @@ public record PlayerSummaryResponse(
         UUID uuid,
         String username,
         LocalDate lastDeathDate,
+        boolean hasLife,
         long totemUses,
         long officialDeaths,
         long playtimeTicks,

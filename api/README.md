@@ -14,7 +14,7 @@ Variables de entorno:
 - `SALCHICHON_API_DB_USER`
 - `SALCHICHON_API_DB_PASSWORD`
 - `SALCHICHON_WEB_ORIGINS` (orígenes separados por coma)
-- `SALCHICHON_SEASON_NAME`, `SALCHICHON_SEASON_DESCRIPTION`, `SALCHICHON_SEASON_DIFFICULTY`, `SALCHICHON_SEASON_START_DATE`
+- `SALCHICHON_SEASON_NAME`, `SALCHICHON_SEASON_DESCRIPTION`, `SALCHICHON_SEASON_DIFFICULTY`, `SALCHICHON_SEASON_START_DATE`, `SALCHICHON_SERVER_TIMEZONE`
 - `SALCHICHON_API_FLYWAY_ENABLED` (por defecto false)
 - `SALCHICHON_API_MIGRATION_DB_URL`, `SALCHICHON_API_MIGRATION_DB_USER`, `SALCHICHON_API_MIGRATION_DB_PASSWORD` (credenciales separadas para ejecutar Flyway; usar un rol de despliegue con permisos DDL)
 
@@ -31,7 +31,7 @@ mvn spring-boot:run
 - `GET /api/v1/health/ready`
 - `GET /api/v1/public/overview`
 - `GET /api/v1/public/players?limit=20&offset=0&sort=value`
-- `GET /api/v1/public/players/{uuid}`
+- `GET /api/v1/public/players/{uuid} (incluye `hasLife`, calculado con la fecha local configurada del servidor)`
 - `GET /api/v1/public/announcements?limit=10`
 - `GET /api/v1/public/upcoming-update` (404 when no future update is published)
 
