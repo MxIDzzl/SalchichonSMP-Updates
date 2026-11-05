@@ -37,12 +37,13 @@ public class PublicDataRepository {
     public List<PlayerSummaryResponse> findPlayers(int limit, int offset, String sort, LocalDate today) {
         String orderBy = orderBy(sort);
         String sql = """
-                SELECT pd.uuid, pd.username, pd.last_death_date, pd.totem_uses,
+                SELECT pd.uuid, pd.username, pskin.texture_hash AS skin_texture_hash, pd.last_death_date, pd.totem_uses,
                        COALESCE(ps.official_deaths, 0) AS official_deaths,
                        COALESCE(ps.playtime_ticks, 0) AS playtime_ticks,
                        COALESCE(ps.player_value, 0) AS player_value
                 FROM player_data pd
                 LEFT JOIN player_stats ps ON ps.player_uuid = pd.uuid
+                LEFT JOIN player_skins pskin ON pskin.player_uuid = pd.uuid
                 ORDER BY %s
                 LIMIT ? OFFSET ?
                 """.formatted(orderBy);
@@ -51,12 +52,13 @@ public class PublicDataRepository {
 
     public Optional<PlayerSummaryResponse> findPlayer(UUID uuid, LocalDate today) {
         List<PlayerSummaryResponse> rows = jdbc.query("""
-                SELECT pd.uuid, pd.username, pd.last_death_date, pd.totem_uses,
+                SELECT pd.uuid, pd.username, pskin.texture_hash AS skin_texture_hash, pd.last_death_date, pd.totem_uses,
                        COALESCE(ps.official_deaths, 0) AS official_deaths,
                        COALESCE(ps.playtime_ticks, 0) AS playtime_ticks,
                        COALESCE(ps.player_value, 0) AS player_value
                 FROM player_data pd
                 LEFT JOIN player_stats ps ON ps.player_uuid = pd.uuid
+                LEFT JOIN player_skins pskin ON pskin.player_uuid = pd.uuid
                 WHERE pd.uuid = ?
                 """, (rs, row) -> mapPlayer(rs, today), uuid);
         return rows.stream().findFirst();
@@ -68,6 +70,7 @@ public class PublicDataRepository {
         return new PlayerSummaryResponse(
                 rs.getObject("uuid", UUID.class),
                 rs.getString("username"),
+                rs.getString("skin_texture_hash"),
                 lastDeathDate,
                 hasLife,
                 rs.getLong("totem_uses"),
