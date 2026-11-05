@@ -21,7 +21,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/admin/trades")
 @ConditionalOnProperty(prefix = "salchichon.admin", name = "enabled", havingValue = "true")
 public class AdminTradeRecoveryController {
-    private static final String RECOVERY_QUERY = """
+    static final String RECOVERY_QUERY = """
             SELECT
                 s.trade_id,
                 s.status AS trade_status,
