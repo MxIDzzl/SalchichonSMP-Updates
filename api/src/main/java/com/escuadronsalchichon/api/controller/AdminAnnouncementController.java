@@ -2,6 +2,7 @@ package com.escuadronsalchichon.api.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,9 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
-import jakarta.validation.constraints.Pattern;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
@@ -39,9 +39,7 @@ public class AdminAnnouncementController {
     @GetMapping
     public java.util.List<Map<String, Object>> list(@RequestParam(defaultValue = "50") int limit,
                                                     @RequestParam(defaultValue = "0") int offset) {
-        if (limit < 1 || limit > 100 || offset < 0 || offset > 100_000) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid pagination parameters");
-        }
+        validatePagination(limit, offset);
         return jdbc.queryForList("""
                 SELECT id, title, body, category, is_published, published_at, expires_at, scheduled_at,
                        is_teaser, created_by, created_at
@@ -62,7 +60,7 @@ public class AdminAnnouncementController {
                     """, request.title().trim(), request.body().trim(), request.category(),
                     request.scheduledAt(), request.expiresAt(), request.teaser(), id);
             if (changed == 0) return false;
-            audit(actor, "ANNOUNCEMENT_EDITED", id, request.reason(),
+            audit("ANNOUNCEMENT_EDITED", id, request.reason(),
                     Map.of("teaser", request.teaser()));
             return true;
         });
@@ -72,8 +70,7 @@ public class AdminAnnouncementController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, Object> create(@Valid @RequestBody CreateAnnouncement request,
-                                      @RequestHeader("X-Admin-Actor") @Size(min = 2, max = 64) String actor) {
+    public Map<String, Object> create(@Valid @RequestBody CreateAnnouncement request) {
         Long id = transaction.execute(status -> {
             Long created = jdbc.queryForObject("""
                     INSERT INTO public_announcements
@@ -83,7 +80,7 @@ public class AdminAnnouncementController {
                     """, Long.class, request.title().trim(), request.body().trim(), request.category(),
                     request.published(), request.publishedAt(), request.expiresAt(), request.scheduledAt(),
                     request.teaser(), actor);
-            audit(actor, "ANNOUNCEMENT_CREATED", created, request.reason(),
+            audit("ANNOUNCEMENT_CREATED", created, request.reason(),
                     Map.of("published", request.published(), "category", request.category()));
             return created;
         });
@@ -91,14 +88,16 @@ public class AdminAnnouncementController {
     }
 
     @PatchMapping("/{id}/publication")
-    public Map<String, Object> setPublication(@PathVariable long id, @Valid @RequestBody PublicationChange request,
-                                               @RequestHeader("X-Admin-Actor") @Size(min = 2, max = 64) String actor) {
+    public Map<String, Object> setPublication(@PathVariable long id, @Valid @RequestBody PublicationChange request) {
         if (id < 1) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid announcement id");
         Boolean updated = transaction.execute(status -> {
-            int changed = jdbc.update("UPDATE public_announcements SET is_published = ?, published_at = CASE WHEN ? THEN COALESCE(published_at, now()) ELSE published_at END WHERE id = ?",
-                    request.published(), request.published(), id);
+            int changed = jdbc.update("""
+                    UPDATE public_announcements
+                    SET is_published = ?, published_at = CASE WHEN ? THEN COALESCE(published_at, now()) ELSE published_at END
+                    WHERE id = ?
+                    """, request.published(), request.published(), id);
             if (changed == 0) return false;
-            audit(actor, request.published() ? "ANNOUNCEMENT_PUBLISHED" : "ANNOUNCEMENT_UNPUBLISHED",
+            audit(request.published() ? "ANNOUNCEMENT_PUBLISHED" : "ANNOUNCEMENT_UNPUBLISHED",
                     id, request.reason(), Map.of("published", request.published()));
             return true;
         });
@@ -106,11 +105,17 @@ public class AdminAnnouncementController {
         return Map.of("id", id, "published", request.published());
     }
 
-    private void audit(String actor, String action, long entityId, String reason, Map<String, Object> details) {
+    private void audit(String action, long entityId, String reason, Map<String, Object> details) {
         jdbc.update("""
                 INSERT INTO public_admin_audit(actor, action, entity_type, entity_id, reason, details)
                 VALUES (?, ?, 'ANNOUNCEMENT', ?, ?, CAST(? AS jsonb))
                 """, actor, action, entityId, reason.trim(), toJson(details));
+    }
+
+    private static void validatePagination(int limit, int offset) {
+        if (limit < 1 || limit > 100 || offset < 0 || offset > 100_000) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid pagination parameters");
+        }
     }
 
     private String toJson(Map<String, Object> values) {
