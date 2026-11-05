@@ -14,6 +14,7 @@ export type PlayerSummary = {
   uuid: string;
   username: string;
   lastDeathDate: string | null;
+  hasLife: boolean;
   totemUses: number;
   officialDeaths: number;
   playtimeTicks: number;
