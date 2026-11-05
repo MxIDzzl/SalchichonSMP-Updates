@@ -10,12 +10,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
 import java.util.Map;
 
 @RestController
+@Validated
 @RequestMapping("/api/v1/admin/announcements")
 @ConditionalOnProperty(prefix = "salchichon.admin", name = "enabled", havingValue = "true")
 public class AdminAnnouncementController {
@@ -81,7 +84,7 @@ public class AdminAnnouncementController {
     public record CreateAnnouncement(
             @NotBlank @Size(max = 160) String title,
             @NotBlank @Size(max = 20_000) String body,
-            @NotBlank @Size(max = 32) String category,
+            @NotBlank @Pattern(regexp = "UPDATE|EVENT|NOTICE|LEAK|MAINTENANCE") String category,
             boolean published,
             OffsetDateTime publishedAt,
             OffsetDateTime expiresAt,
