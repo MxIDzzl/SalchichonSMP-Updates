@@ -36,6 +36,40 @@ public class AdminAnnouncementController {
         this.actor = actor;
     }
 
+    @GetMapping
+    public java.util.List<Map<String, Object>> list(@RequestParam(defaultValue = "50") int limit,
+                                                    @RequestParam(defaultValue = "0") int offset) {
+        if (limit < 1 || limit > 100 || offset < 0 || offset > 100_000) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid pagination parameters");
+        }
+        return jdbc.queryForList("""
+                SELECT id, title, body, category, is_published, published_at, expires_at, scheduled_at,
+                       is_teaser, created_by, created_at
+                FROM public_announcements
+                ORDER BY created_at DESC, id DESC
+                LIMIT ? OFFSET ?
+                """, limit, offset);
+    }
+
+    @PutMapping("/{id}")
+    public Map<String, Object> edit(@PathVariable long id, @Valid @RequestBody EditAnnouncement request) {
+        if (id < 1) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid announcement id");
+        Boolean updated = transaction.execute(status -> {
+            int changed = jdbc.update("""
+                    UPDATE public_announcements
+                    SET title = ?, body = ?, category = ?, scheduled_at = ?, expires_at = ?, is_teaser = ?
+                    WHERE id = ?
+                    """, request.title().trim(), request.body().trim(), request.category(),
+                    request.scheduledAt(), request.expiresAt(), request.teaser(), id);
+            if (changed == 0) return false;
+            audit(actor, "ANNOUNCEMENT_EDITED", id, request.reason(),
+                    Map.of("teaser", request.teaser()));
+            return true;
+        });
+        if (!Boolean.TRUE.equals(updated)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Announcement not found");
+        return Map.of("id", id, "updated", true);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, Object> create(@Valid @RequestBody CreateAnnouncement request,
@@ -93,6 +127,15 @@ public class AdminAnnouncementController {
             OffsetDateTime publishedAt,
             OffsetDateTime expiresAt,
             OffsetDateTime scheduledAt,
+            boolean teaser,
+            @NotBlank @Size(max = 500) String reason) {}
+
+    public record EditAnnouncement(
+            @NotBlank @Size(max = 160) String title,
+            @NotBlank @Size(max = 20_000) String body,
+            @NotBlank @Pattern(regexp = "UPDATE|EVENT|NOTICE|LEAK|MAINTENANCE") String category,
+            OffsetDateTime scheduledAt,
+            OffsetDateTime expiresAt,
             boolean teaser,
             @NotBlank @Size(max = 500) String reason) {}
 
