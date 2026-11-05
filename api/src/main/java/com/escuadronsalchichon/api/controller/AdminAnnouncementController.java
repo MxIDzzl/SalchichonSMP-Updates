@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,12 +25,15 @@ import java.util.Map;
 public class AdminAnnouncementController {
     private final JdbcTemplate jdbc;
     private final TransactionTemplate transaction;
+    private final String actor;
 
     public AdminAnnouncementController(
             @Qualifier("adminJdbcTemplate") JdbcTemplate jdbc,
-            @Qualifier("adminTransactionManager") PlatformTransactionManager transactionManager) {
+            @Qualifier("adminTransactionManager") PlatformTransactionManager transactionManager,
+            @Value("${salchichon.admin.actor:configured-admin}") String actor) {
         this.jdbc = jdbc;
         this.transaction = new TransactionTemplate(transactionManager);
+        this.actor = actor;
     }
 
     @PostMapping
