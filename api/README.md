@@ -53,19 +53,27 @@ Correcciones estadísticas:
 - `PUT /api/v1/admin/players/{uuid}/stats/deaths`
 - `PUT /api/v1/admin/players/{uuid}/stats/playtime`
 - Body: `{"value":123,"reason":"Corrección por ..."}`
-- Solo permite muertes oficiales y ticks de juego. La corrección actualiza `player_stats`, inserta un evento append-only en `stat_events` y registra el mismo cambio en `public_admin_audit`, todo atómicamente.
+- Solo permite muertes oficiales y ticks de juego. La corrección actualiza `player_stats`, inserta un evento append-only en `stat_events` y registra el cambio en `public_admin_audit`, todo atómicamente.
 - Player Value, inventarios, tótems, vidas y datos de trade no se modifican desde esta ruta.
 
-La administración usa un pool PostgreSQL separado. Su rol debe tener únicamente:
-- SELECT sobre `player_data` y `player_stats`.
-- INSERT/UPDATE sobre `public_announcements` y SELECT/INSERT sobre `public_admin_audit`.
+Inspección de recuperación de trades:
+- `GET /api/v1/admin/trades/recovery?limit=50&offset=0`
+- Lista sesiones marcadas `RECOVERY_REQUIRED` y operaciones de ítems en `PREPARED`, `DELIVERY_PENDING`, `DELIVERING`, `RETURN_PENDING` o `RECOVERY_REQUIRED`.
+- Incluye participantes, propietario/destinatario, estados, huellas SHA-256 y fechas para que el staff pueda investigar.
+- Nunca devuelve el payload serializado de los ítems ni ofrece una acción de entrega/cancelación forzada. La resolución requiere verificar inventario y marcadores PDC dentro del servidor, no inferirla desde el panel.
+
+### Permisos PostgreSQL del rol administrativo
+Limitar el rol a lo estrictamente necesario:
+- SELECT sobre `player_data`, `player_stats`, `trade_sessions` y `trade_item_operations`.
+- INSERT/UPDATE sobre `public_announcements`.
+- SELECT/INSERT sobre `public_admin_audit`.
 - INSERT/UPDATE sobre `player_stats` e INSERT sobre `stat_events`.
-- No conceder permisos sobre tablas de bóveda, operaciones, trade, `player_value_adjustments` ni el resto del estado del plugin.
+- No conceder permisos sobre bóveda, `player_value_items`, `player_value_adjustments`, `trade_escrow_items` ni otras tablas operativas.
 
 Habilitar requiere `SALCHICHON_ADMIN_ENABLED=true`, token privado y credenciales separadas. Mantener el token en un gateway/backend privado: nunca en JavaScript del navegador ni en variables `NEXT_PUBLIC_*`. Esta fase usa una identidad de operador configurada, no OIDC/RBAC multiusuario. Antes de producción se requiere gateway autenticado, HTTPS, rate limiting, rotación/revocación y pruebas de staging.
 
 ## Skins de jugadores
 La migración API V3 crea `player_skins`. El plugin sincroniza únicamente el hash público de textura de SkinsRestorer (API major 15); no se guardan firmas ni credenciales. Los perfiles sin hash permanecen sin avatar.
 
-## Migraciones
-Aplicar las migraciones API V1-V4 con credenciales DDL separadas. Mantener PostgreSQL privado y realizar backup verificado antes de cualquier migración. No habilitar los servicios administrativos ni cambiar el plugin a PostgreSQL sin ensayos completos de recuperación.
+## Migraciones y recuperación
+Aplicar las migraciones API V1-V4 con credenciales DDL separadas. Aplicar el esquema del plugin v1-v6 tras backup verificado. PostgreSQL debe permanecer privado. No habilitar los servicios administrativos ni cambiar el plugin a PostgreSQL sin ensayos completos de recuperación.
