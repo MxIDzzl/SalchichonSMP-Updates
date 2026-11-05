@@ -70,7 +70,7 @@ public class PublicDataRepository {
         return new PlayerSummaryResponse(
                 rs.getObject("uuid", UUID.class),
                 rs.getString("username"),
-                rs.getString("skin_texture_hash"),
+                normalizeSkinTextureHash(rs.getString("skin_texture_hash")),
                 lastDeathDate,
                 hasLife,
                 rs.getLong("totem_uses"),
@@ -123,6 +123,11 @@ public class PublicDataRepository {
     public boolean databaseReady() {
         Integer result = jdbc.queryForObject("SELECT 1", Integer.class);
         return result != null && result == 1;
+    }
+
+    static String normalizeSkinTextureHash(String textureHash) {
+        if (textureHash == null || !textureHash.matches("(?i)[0-9a-f]{32,64}")) return null;
+        return textureHash.toLowerCase(java.util.Locale.ROOT);
     }
 
     static boolean hasLifeOn(LocalDate lastDeathDate, LocalDate today) {
