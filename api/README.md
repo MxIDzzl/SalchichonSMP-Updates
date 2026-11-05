@@ -64,11 +64,12 @@ Inspección de recuperación de trades:
 
 ### Permisos PostgreSQL del rol administrativo
 Limitar el rol a lo estrictamente necesario:
-- SELECT sobre `player_data`, `player_stats`, `trade_sessions` y `trade_item_operations`.
+- SELECT sobre `player_data`, `player_stats` y `trade_sessions`.
+- SELECT **solo por columnas** en `trade_item_operations`: `operation_id`, `trade_id`, `owner_uuid`, `recipient_uuid`, `item_fingerprint`, `status`, `created_at`, `updated_at` y `delivered_at`. No conceder SELECT sobre `item_payload`; el endpoint no necesita ni devuelve ese contenido.
 - INSERT/UPDATE sobre `public_announcements`.
 - SELECT/INSERT sobre `public_admin_audit`.
 - INSERT/UPDATE sobre `player_stats` e INSERT sobre `stat_events`.
-- No conceder permisos sobre bóveda, `player_value_items`, `player_value_adjustments`, `trade_escrow_items` ni otras tablas operativas.
+- No conceder permisos sobre bóveda, `player_value_items`, `player_value_adjustments`, `trade_escrow_items` ni otras tablas operativas. En `trade_item_operations`, evitar SELECT a nivel de tabla: usar GRANT de columnas para excluir `item_payload`.
 
 Habilitar requiere `SALCHICHON_ADMIN_ENABLED=true`, token privado y credenciales separadas. Mantener el token en un gateway/backend privado: nunca en JavaScript del navegador ni en variables `NEXT_PUBLIC_*`. Esta fase usa una identidad de operador configurada, no OIDC/RBAC multiusuario. Antes de producción se requiere gateway autenticado, HTTPS, rate limiting, rotación/revocación y pruebas de staging.
 
