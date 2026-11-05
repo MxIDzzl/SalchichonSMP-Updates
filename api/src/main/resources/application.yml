@@ -33,3 +33,7 @@ salchichon:
     start-date: ${SALCHICHON_SEASON_START_DATE:2026-10-19}
   server:
     timezone: ${SALCHICHON_SERVER_TIMEZONE:America/Mexico_City}
+
+  admin:
+    enabled: ${SALCHICHON_ADMIN_ENABLED:false}
+    token: ${SALCHICHON_ADMIN_TOKEN:}
