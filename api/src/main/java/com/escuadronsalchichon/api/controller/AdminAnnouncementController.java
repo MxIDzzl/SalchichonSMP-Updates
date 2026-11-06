@@ -16,6 +16,7 @@ import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.validation.annotation.Validated;
@@ -108,6 +109,10 @@ public class AdminAnnouncementController {
         return Map.of("id", id, "published", request.published());
     }
 
+    private static Timestamp timestamp(OffsetDateTime value) {
+        return value == null ? null : Timestamp.from(value.toInstant());
+    }
+
     private Long insertAnnouncement(CreateAnnouncement request) {
         String sql = """
                 INSERT INTO public_announcements
@@ -121,9 +126,9 @@ public class AdminAnnouncementController {
             statement.setString(2, request.body().trim());
             statement.setString(3, request.category());
             statement.setBoolean(4, request.published());
-            statement.setObject(5, request.publishedAt());
-            statement.setObject(6, request.expiresAt());
-            statement.setObject(7, request.scheduledAt());
+            statement.setTimestamp(5, timestamp(request.publishedAt()));
+            statement.setTimestamp(6, timestamp(request.expiresAt()));
+            statement.setTimestamp(7, timestamp(request.scheduledAt()));
             statement.setBoolean(8, request.teaser());
             statement.setString(9, actor);
             return statement;
