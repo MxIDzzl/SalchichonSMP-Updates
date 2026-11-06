@@ -20,6 +20,42 @@ export type PlayerSummary = {
   officialDeaths: number;
   playtimeTicks: number;
   playerValue: string;
+  clanUuid: string | null;
+  clanName: string | null;
+  clanTag: string | null;
+  clanLevel: number | null;
+  clanRank: string | null;
+};
+
+export type ClanSummary = {
+  uuid: string;
+  name: string;
+  tag: string;
+  description: string;
+  leaderUuid: string;
+  createdAt: string;
+  memberCount: number;
+  maxMembers: number;
+  points: number;
+  level: number;
+  kills: number;
+  deaths: number;
+  kdr: number;
+};
+
+export type ClanMember = {
+  playerUuid: string;
+  username: string;
+  rankId: string;
+  joinedAt: string;
+  kills: number;
+  deaths: number;
+  kdr: number;
+};
+
+export type ClanDetail = {
+  clan: ClanSummary;
+  members: ClanMember[];
 };
 
 export type Announcement = {
@@ -69,6 +105,15 @@ export function getPlayers(limit = 50, offset = 0, sort = "value") {
 
 export function getPlayer(uuid: string) {
   return apiGet<PlayerSummary>(`/public/players/${encodeURIComponent(uuid)}`);
+}
+
+export function getClans(limit = 50, offset = 0, sort = "points") {
+  const query = new URLSearchParams({ limit: String(limit), offset: String(offset), sort });
+  return apiGet<ClanSummary[]>(`/public/clans?${query.toString()}`);
+}
+
+export function getClan(uuid: string) {
+  return apiGet<ClanDetail>(`/public/clans/${encodeURIComponent(uuid)}`);
 }
 
 export function getAnnouncements(limit = 5) {
