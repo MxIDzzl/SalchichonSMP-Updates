@@ -11,5 +11,6 @@ public record OverviewResponse(
         String seasonDescription,
         String difficulty,
         String seasonStartDate,
+        long seasonDay,
         Instant generatedAt
 ) {}
