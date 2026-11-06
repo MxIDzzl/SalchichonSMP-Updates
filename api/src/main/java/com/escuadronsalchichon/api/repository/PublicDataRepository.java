@@ -168,8 +168,8 @@ public class PublicDataRepository {
                 SELECT id, title, body, category, published_at, expires_at
                 FROM public_announcements
                 WHERE is_published = TRUE
-                  AND published_at <= now()
-                  AND (expires_at IS NULL OR expires_at > now())
+                  AND published_at <= UTC_TIMESTAMP(6)
+                  AND (expires_at IS NULL OR expires_at > UTC_TIMESTAMP(6))
                 ORDER BY published_at DESC, id DESC
                 LIMIT ?
                 """, (rs, row) -> new AnnouncementResponse(
@@ -188,8 +188,8 @@ public class PublicDataRepository {
                 FROM public_announcements
                 WHERE is_published = TRUE
                   AND scheduled_at IS NOT NULL
-                  AND scheduled_at > now()
-                  AND (expires_at IS NULL OR expires_at > now())
+                  AND scheduled_at > UTC_TIMESTAMP(6)
+                  AND (expires_at IS NULL OR expires_at > UTC_TIMESTAMP(6))
                 ORDER BY scheduled_at ASC, id ASC
                 LIMIT 1
                 """, (rs, row) -> new UpcomingUpdateResponse(
