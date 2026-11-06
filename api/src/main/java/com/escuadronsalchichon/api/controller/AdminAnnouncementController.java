@@ -69,7 +69,7 @@ public class AdminAnnouncementController {
                     SET title = ?, body = ?, category = ?, scheduled_at = ?, expires_at = ?, is_teaser = ?
                     WHERE id = ?
                     """, request.title().trim(), request.body().trim(), request.category(),
-                    request.scheduledAt(), request.expiresAt(), request.teaser(), id);
+                    timestamp(request.scheduledAt()), timestamp(request.expiresAt()), request.teaser(), id);
             if (changed == 0) return false;
             audit("ANNOUNCEMENT_EDITED", id, request.reason(),
                     Map.of("teaser", request.teaser()));
