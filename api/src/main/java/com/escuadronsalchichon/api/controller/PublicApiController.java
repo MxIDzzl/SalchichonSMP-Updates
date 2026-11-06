@@ -114,7 +114,7 @@ public class PublicApiController {
             return difficulty;
         }
         long seasonDay = Math.max(1, ChronoUnit.DAYS.between(startDate, LocalDate.now(serverZone)) + 1);
-        Map<Long, String> stages = new TreeMap<>();
+        TreeMap<Long, String> stages = new TreeMap<>();
         for (String entry : difficultyStages.split(",")) {
             String[] parts = entry.trim().split(":", 2);
             if (parts.length != 2 || parts[1].isBlank()) continue;
@@ -125,7 +125,7 @@ public class PublicApiController {
                 // Invalid optional stage entries are ignored; the configured base remains safe.
             }
         }
-        Map.Entry<Long, String> active = ((TreeMap<Long, String>) stages).floorEntry(seasonDay);
+        Map.Entry<Long, String> active = stages.floorEntry(seasonDay);
         return active == null ? difficulty : active.getValue();
     }
 
