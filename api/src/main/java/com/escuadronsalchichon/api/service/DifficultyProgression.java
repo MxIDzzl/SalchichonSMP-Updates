@@ -9,21 +9,24 @@ import java.util.TreeMap;
 public final class DifficultyProgression {
     private DifficultyProgression() {}
 
+    public static long seasonDay(String seasonStartDate, LocalDate today) {
+        if (seasonStartDate == null || today == null) return 0;
+        try {
+            LocalDate startDate = LocalDate.parse(seasonStartDate);
+            long daysSinceStart = ChronoUnit.DAYS.between(startDate, today);
+            return daysSinceStart < 0 ? 0 : daysSinceStart + 1;
+        } catch (RuntimeException invalidDate) {
+            return 0;
+        }
+    }
+
     public static String resolve(String baseDifficulty, String seasonStartDate,
                                  String configuredStages, LocalDate today) {
         if (configuredStages == null || configuredStages.isBlank() || today == null) {
             return baseDifficulty;
         }
-        final LocalDate startDate;
-        try {
-            startDate = LocalDate.parse(seasonStartDate);
-        } catch (RuntimeException invalidDate) {
-            return baseDifficulty;
-        }
-
-        long daysSinceStart = ChronoUnit.DAYS.between(startDate, today);
-        if (daysSinceStart < 0) return baseDifficulty;
-        long seasonDay = daysSinceStart + 1;
+        long seasonDay = seasonDay(seasonStartDate, today);
+        if (seasonDay == 0) return baseDifficulty;
         TreeMap<Long, String> stages = new TreeMap<>();
         for (String entry : configuredStages.split(",")) {
             String[] parts = entry.trim().split(":", 2);
