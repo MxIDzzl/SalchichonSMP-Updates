@@ -12,6 +12,7 @@ const features = [
 const nav = [
   ["Temporada", "#season"],
   ["Jugadores", "/players"],
+  ["Clanes", "/clans"],
   ["Rankings", "/rankings"],
   ["Sistema", "#system"],
   ["Novedades", "#updates"],
