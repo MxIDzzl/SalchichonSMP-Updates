@@ -40,6 +40,8 @@ Si el panel genera una sola cuenta por base de datos y no permite cuentas/grants
 
 ## API
 
+Al iniciar, la API registra en sus logs el nombre y la versión del motor SQL conectado. El plugin hace lo mismo en la consola de Paper. Estos datos se mantienen en logs privados y no se exponen en endpoints públicos.
+
 Variables mínimas:
 - `SALCHICHON_API_DB_URL`: URL JDBC privada MySQL, por ejemplo `jdbc:mysql://HOST:3306/salchichon?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC`.
 - `SALCHICHON_API_DB_USER` y `SALCHICHON_API_DB_PASSWORD`: usuario público de solo lectura.
