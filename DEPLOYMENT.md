@@ -10,7 +10,7 @@ La web y la API son servicios separados. El navegador solo habla con Next.js; Ne
 - Next.js: consulta la API desde el servidor mediante `SALCHICHON_API_URL`; no recibe credenciales de base de datos.
 
 ## Orden de despliegue futuro (solo staging hasta aprobar los gates)
-1. Confirmar la versión exacta de MySQL/MariaDB del proveedor y que permite conexiones desde los procesos Paper y API.
+1. Confirmar que el proveedor permite conexiones desde los procesos Paper y API y obtener endpoint, puerto, nombre de base y usuario. No es necesario conocer de antemano la versión del motor: se detectará en los logs privados al conectar en staging.
 2. Crear una base MySQL vacía y un usuario de escritura para el plugin. Si el proveedor permite cuentas separadas, aplicar [plugin-role-grants.example.sql](https://github.com/MxIDzzl/SalchichonSMP-Updates/blob/6e65d19e13a6d27d2048dc092cff20a714d71839/api/docs/plugin-role-grants.example.sql) y limitar el host al servidor Paper. Mantener SQLite intacta y respaldada.
 3. Instalar SalchichonHardcore en un servidor de staging; habilitar `database.mysql.enabled: true`. Si se importa la base anterior, habilitar `database.mysql.import-sqlite-on-startup: true` solo para el primer arranque. El importador exige destino vacío, valida SQLite, copia y verifica conteos/IDs, y restablece el indicador tras éxito.
 4. Aplicar migraciones API V1-V5 con credenciales DDL separadas y baseline 0.
@@ -31,7 +31,7 @@ Si el panel genera una sola cuenta por base de datos y no permite cuentas/grants
 
 ## MySQL
 
-Las suites de integración del plugin y la API pasan contra MySQL 8.4, MariaDB 10.11 y MariaDB 11.4. Eso valida esas versiones de CI, pero no identifica el motor del proveedor: el plugin y la API registran el nombre y la versión reales en sus logs privados al conectarse. Confirma ese dato en staging antes de producción.
+Las suites de integración del plugin y la API pasan contra MySQL 8.4, MariaDB 10.11 y MariaDB 11.4. Eso valida esas versiones de CI, pero no identifica el motor del proveedor. No necesitas buscar ese dato en el panel: el plugin y la API registran el nombre y la versión reales en sus logs privados al conectarse en staging; revísalos antes de producción.
 
 - La base de datos debe ser privada y accesible solo desde Paper y la API.
 - El usuario del plugin necesita los permisos de escritura que requiere SalchichonHardcore; el ejemplo de grants evita conceder `DROP`, `ALTER` o `GRANT OPTION`.
@@ -42,7 +42,7 @@ Las suites de integración del plugin y la API pasan contra MySQL 8.4, MariaDB 1
 
 ## API
 
-Al iniciar, la API registra en sus logs el nombre y la versión del motor SQL conectado. El plugin hace lo mismo en la consola de Paper. Estos datos se mantienen en logs privados y no se exponen en endpoints públicos.
+Al iniciar, la API registra en sus logs el nombre y la versión del motor SQL conectado. El plugin hace lo mismo en la consola de Paper. Estos datos se mantienen en logs privados y no se exponen en endpoints públicos. Por eso, la versión del proveedor se confirma después de la primera conexión de staging, no como requisito previo.
 
 Variables mínimas:
 - `SALCHICHON_API_DB_URL`: URL JDBC privada MySQL, por ejemplo `jdbc:mysql://HOST:3306/salchichon?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC`.
