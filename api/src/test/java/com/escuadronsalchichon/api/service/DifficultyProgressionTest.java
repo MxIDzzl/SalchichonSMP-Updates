@@ -27,6 +27,12 @@ class DifficultyProgressionTest {
     }
 
     @Test
+    void doesNotStartProgressionBeforeTheSeasonBegins() {
+        assertEquals("BASE", DifficultyProgression.resolve(
+                "BASE", "2026-11-14", "1:HARD,14:HARD+", LocalDate.of(2026, 11, 13)));
+    }
+
+    @Test
     void doesNotActivateAStageBeforeItsThreshold() {
         assertEquals("BASE", DifficultyProgression.resolve(
                 "BASE", "2026-11-01", "14:HARD+,28:EXTREME", LocalDate.of(2026, 11, 10)));
