@@ -5,7 +5,7 @@ Servicio Spring Boot independiente para el portal público y una superficie admi
 ## Requisitos
 - Java 25
 - Maven 3.9+
-- PostgreSQL con el esquema del plugin v1-v6 y las migraciones API V1-V5 aplicadas
+- PostgreSQL con el esquema del plugin v1-v7 y las migraciones API V1-V5 aplicadas
 - Rol runtime de solo lectura para la API pública (ejemplo en `docs/public-role-grants.example.sql`)
 
 ## Configuración
@@ -81,7 +81,7 @@ Habilitar requiere `SALCHICHON_ADMIN_ENABLED=true`, token privado y credenciales
 La migración API V3 crea `player_skins`. El plugin sincroniza únicamente el hash público de textura de SkinsRestorer (API major 15); no se guardan firmas ni credenciales. Los perfiles sin hash permanecen sin avatar.
 
 ## Migraciones y recuperación
-Aplicar las migraciones API V1-V5 con credenciales DDL separadas. Aplicar el esquema del plugin v1-v6 tras backup verificado. PostgreSQL debe permanecer privado. No habilitar los servicios administrativos ni cambiar el plugin a PostgreSQL sin ensayos completos de recuperación.
+Aplicar las migraciones API V1-V5 con credenciales DDL separadas. Aplicar el esquema del plugin v1-v7 tras backup verificado. PostgreSQL debe permanecer privado. No habilitar los servicios administrativos ni cambiar el plugin a PostgreSQL sin ensayos completos de recuperación.
 
 
 ## Sincronización de clanes
