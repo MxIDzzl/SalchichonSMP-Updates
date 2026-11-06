@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS public_clans (
     CONSTRAINT chk_public_clans_kills CHECK (kills >= 0),
     CONSTRAINT chk_public_clans_deaths CHECK (deaths >= 0),
     CONSTRAINT chk_public_clans_kdr CHECK (kdr >= 0)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS player_clan_memberships (
     player_uuid CHAR(36) NOT NULL PRIMARY KEY,
@@ -41,4 +41,4 @@ CREATE TABLE IF NOT EXISTS player_clan_memberships (
     CONSTRAINT chk_player_clan_memberships_kills CHECK (kills >= 0),
     CONSTRAINT chk_player_clan_memberships_deaths CHECK (deaths >= 0),
     CONSTRAINT chk_player_clan_memberships_kdr CHECK (kdr >= 0)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
