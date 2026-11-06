@@ -9,4 +9,4 @@ CREATE TABLE IF NOT EXISTS public_admin_audit (
     created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     INDEX idx_public_admin_audit_entity (entity_type, entity_id, created_at DESC),
     INDEX idx_public_admin_audit_created (created_at DESC)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
