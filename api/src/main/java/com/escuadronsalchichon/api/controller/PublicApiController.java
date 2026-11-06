@@ -32,10 +32,10 @@ public class PublicApiController {
 
     public PublicApiController(
             PublicDataRepository repository,
-            @Value("${salchichon.season.name:UHC SEASON 1}") String seasonName,
-            @Value("${salchichon.season.description:Una temporada de supervivencia donde cada decisión tiene consecuencias.}") String seasonDescription,
-            @Value("${salchichon.season.difficulty:HARD}") String difficulty,
-            @Value("${salchichon.season.start-date:2026-10-19}") String seasonStartDate,
+            @Value("${salchichon.season.name:TEMPORADA SIN SINCRONIZAR}") String seasonName,
+            @Value("${salchichon.season.description:La información oficial de la temporada aún no está sincronizada.}") String seasonDescription,
+            @Value("${salchichon.season.difficulty:—}") String difficulty,
+            @Value("${salchichon.season.start-date:—}") String seasonStartDate,
             @Value("${salchichon.server.timezone:America/Mexico_City}") String serverTimezone
     ) {
         this.repository = repository;
