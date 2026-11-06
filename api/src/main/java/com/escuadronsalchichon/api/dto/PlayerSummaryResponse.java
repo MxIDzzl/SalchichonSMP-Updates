@@ -12,5 +12,10 @@ public record PlayerSummaryResponse(
         long totemUses,
         long officialDeaths,
         long playtimeTicks,
-        String playerValue
+        String playerValue,
+        UUID clanUuid,
+        String clanName,
+        String clanTag,
+        Integer clanLevel,
+        String clanRank
 ) {}
