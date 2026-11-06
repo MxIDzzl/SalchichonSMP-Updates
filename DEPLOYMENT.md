@@ -69,7 +69,7 @@ docker run --rm -p 3000:3000 -e SALCHICHON_API_URL=http://API_PRIVADA:8080 salch
 
 ## Límites de la primera publicación
 
-- Player Value permanece desactivado hasta terminar la GUI tipo cofre y las pruebas de recuperación de depósitos/retiros.
+- Player Value incluye el selector tipo cofre, pero permanece desactivado hasta completar pruebas de recuperación de depósitos/retiros y validación en staging.
 - Los intercambios siguen a cargo del plugin externo.
 - El panel administrativo requiere autenticación/autorización antes de habilitar acciones.
 - Los niveles/atributos de mobs se implementarán en una fase posterior.
