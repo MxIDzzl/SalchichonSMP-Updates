@@ -10,6 +10,8 @@ GRANT SELECT ON TABLE
     player_data,
     player_stats,
     player_skins,
+    public_clans,
+    player_clan_memberships,
     public_announcements
 TO salchichon_readonly;
 
