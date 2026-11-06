@@ -11,7 +11,7 @@
 Este repositorio contiene dos servicios separados:
 
 - **Portal Next.js:** portada, estadísticas, directorio y perfiles de jugadores, rankings, clanes y archivo de novedades.
-- **API Spring Boot:** lectura pública de datos de PostgreSQL y endpoints administrativos privados, desactivados por defecto.
+- **API Spring Boot:** lectura pública de datos de MySQL y endpoints administrativos privados, desactivados por defecto.
 
 El plugin Paper vive en [SalchichonHardcore](https://github.com/MxIDzzl/SalchichonHardcore). La web no administra clanes ni intercambios: lee el snapshot oficial de zMClans y las estadísticas del plugin; los trades siguen a cargo del plugin externo del servidor.
 
@@ -23,7 +23,7 @@ La dificultad puede avanzar automáticamente por día de temporada mediante la c
 
 ## Despliegue
 
-Consulta [DEPLOYMENT.md](DEPLOYMENT.md) para los requisitos, orden de despliegue, variables de entorno, permisos de PostgreSQL y verificaciones de aceptación.
+Consulta [DEPLOYMENT.md](DEPLOYMENT.md) para los requisitos, orden de despliegue, variables de entorno, permisos de MySQL y verificaciones de aceptación.
 
 ## Desarrollo
 
@@ -41,16 +41,17 @@ mvn clean verify
 mvn spring-boot:run
 ```
 
-La web consulta la API desde el servidor mediante `SALCHICHON_API_URL`. Nunca expongas credenciales de PostgreSQL ni tokens en variables `NEXT_PUBLIC_*`.
+La web consulta la API desde el servidor mediante `SALCHICHON_API_URL`. Nunca expongas credenciales de MySQL ni tokens en variables `NEXT_PUBLIC_*`.
 
 ## Seguridad y límites de la primera publicación
 
-- PostgreSQL debe permanecer privado.
-- La API pública utiliza un rol SELECT-only.
-- El panel /admin permanece sin operaciones y la API administrativa desactivada hasta completar autenticación y autorización reales.
+- MySQL debe permanecer privado y accesible solo desde los servicios autorizados.
+- La API pública utiliza un rol SELECT-only cuando el hosting permite cuentas/permisos separados.
+- El panel /admin permanece sin operaciones desde la web y la API administrativa desactivada hasta completar autenticación y autorización reales.
 - Player Value ya tiene selector tipo cofre; permanece desactivado hasta completar pruebas de recuperación y staging.
 - Los intercambios los gestiona el plugin externo.
 - La sincronización de clanes es de solo lectura desde zMClans.
+- SQLite se conserva intacta hasta completar staging, importación verificada y pruebas de restauración.
 
 ## Enlaces
 
