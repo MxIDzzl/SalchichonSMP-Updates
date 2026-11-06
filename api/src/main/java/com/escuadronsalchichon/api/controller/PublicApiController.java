@@ -7,6 +7,7 @@ import com.escuadronsalchichon.api.dto.OverviewResponse;
 import com.escuadronsalchichon.api.dto.PlayerSummaryResponse;
 import com.escuadronsalchichon.api.dto.UpcomingUpdateResponse;
 import com.escuadronsalchichon.api.repository.PublicDataRepository;
+import com.escuadronsalchichon.api.service.DifficultyProgression;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Map;
-import java.util.TreeMap;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
@@ -58,7 +56,7 @@ public class PublicApiController {
     public OverviewResponse overview() {
         PublicDataRepository.OverviewTotals totals = repository.overviewTotals();
         return new OverviewResponse(totals.players(), totals.officialDeaths(), totals.playtimeTicks(),
-                totals.playerValue(), seasonName, seasonDescription, resolveDifficulty(), seasonStartDate, Instant.now());
+                totals.playerValue(), seasonName, seasonDescription, DifficultyProgression.resolve(difficulty, seasonStartDate, difficultyStages, LocalDate.now(serverZone)), seasonStartDate, Instant.now());
     }
 
     @GetMapping("/public/players")
@@ -103,30 +101,6 @@ public class PublicApiController {
     public UpcomingUpdateResponse upcomingUpdate() {
         return repository.findUpcomingUpdate()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No upcoming update"));
-    }
-
-    private String resolveDifficulty() {
-        if (difficultyStages == null || difficultyStages.isBlank()) return difficulty;
-        final LocalDate startDate;
-        try {
-            startDate = LocalDate.parse(seasonStartDate);
-        } catch (RuntimeException invalidDate) {
-            return difficulty;
-        }
-        long seasonDay = Math.max(1, ChronoUnit.DAYS.between(startDate, LocalDate.now(serverZone)) + 1);
-        TreeMap<Long, String> stages = new TreeMap<>();
-        for (String entry : difficultyStages.split(",")) {
-            String[] parts = entry.trim().split(":", 2);
-            if (parts.length != 2 || parts[1].isBlank()) continue;
-            try {
-                long day = Long.parseLong(parts[0].trim());
-                if (day > 0) stages.put(day, parts[1].trim());
-            } catch (NumberFormatException ignored) {
-                // Invalid optional stage entries are ignored; the configured base remains safe.
-            }
-        }
-        Map.Entry<Long, String> active = stages.floorEntry(seasonDay);
-        return active == null ? difficulty : active.getValue();
     }
 
     private void validatePage(int limit, int offset) {
