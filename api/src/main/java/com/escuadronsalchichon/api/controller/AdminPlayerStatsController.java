@@ -9,6 +9,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.validation.annotation.Validated;
@@ -46,32 +51,28 @@ public class AdminPlayerStatsController {
 
         Long eventId = transaction.execute(status -> {
             var player = jdbc.query("SELECT uuid FROM player_data WHERE uuid = ?",
-                    (rs, row) -> rs.getObject(1, UUID.class), uuid);
+                    (rs, row) -> UUID.fromString(rs.getString(1)), uuid.toString());
             if (player.isEmpty()) return null;
 
             jdbc.update("""
                     INSERT INTO player_stats(player_uuid, official_deaths, playtime_ticks, player_value, updated_at)
                     VALUES (?, 0, 0, 0, now())
-                    ON CONFLICT(player_uuid) DO NOTHING
-                    """, uuid);
+                    ON DUPLICATE KEY UPDATE player_uuid = VALUES(player_uuid)
+                    """, uuid.toString());
 
             Long previous = jdbc.queryForObject(
                     "SELECT " + column + " FROM player_stats WHERE player_uuid = ? FOR UPDATE",
-                    Long.class, uuid);
+                    Long.class, uuid.toString());
             int changed = jdbc.update(
                     "UPDATE player_stats SET " + column + " = ?, updated_at = now() WHERE player_uuid = ?",
-                    request.value(), uuid);
+                    request.value(), uuid.toString());
             if (changed != 1) throw new IllegalStateException("Player statistic update was not applied");
 
-            Long createdEvent = jdbc.queryForObject("""
-                    INSERT INTO stat_events(player_uuid, stat_key, previous_value, new_value, actor, reason)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                    RETURNING id
-                    """, Long.class, uuid, column, previous, request.value(), actor, request.reason().trim());
+            Long createdEvent = insertStatEvent(uuid, column, previous, request);
 
             jdbc.update("""
                     INSERT INTO public_admin_audit(actor, action, entity_type, entity_id, reason, details)
-                    VALUES (?, 'PLAYER_STAT_CORRECTED', 'PLAYER_STAT_EVENT', ?, ?, CAST(? AS jsonb))
+                    VALUES (?, 'PLAYER_STAT_CORRECTED', 'PLAYER_STAT_EVENT', ?, ?, ?)
                     """, actor, createdEvent, request.reason().trim(),
                     "{\"playerUuid\":\"" + uuid + "\",\"stat\":\"" + column
                             + "\",\"previous\":" + previous + ",\"value\":" + request.value() + "}");
@@ -80,6 +81,27 @@ public class AdminPlayerStatsController {
 
         if (eventId == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found");
         return Map.of("playerUuid", uuid, "stat", column, "value", request.value(), "eventId", eventId);
+    }
+
+    private Long insertStatEvent(UUID uuid, String column, Long previous, StatCorrection request) {
+        String sql = """
+                INSERT INTO stat_events(player_uuid, stat_key, previous_value, new_value, actor, reason)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """;
+        KeyHolder keys = new GeneratedKeyHolder();
+        jdbc.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, uuid.toString());
+            statement.setString(2, column);
+            statement.setLong(3, previous);
+            statement.setLong(4, request.value());
+            statement.setString(5, actor);
+            statement.setString(6, request.reason().trim());
+            return statement;
+        }, keys);
+        Number key = keys.getKey();
+        if (key == null) throw new IllegalStateException("Stat event insert did not return an id");
+        return key.longValue();
     }
 
     static String columnFor(String stat) {
