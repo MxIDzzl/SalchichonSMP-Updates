@@ -21,7 +21,9 @@ public final class DifficultyProgression {
             return baseDifficulty;
         }
 
-        long seasonDay = Math.max(1, ChronoUnit.DAYS.between(startDate, today) + 1);
+        long daysSinceStart = ChronoUnit.DAYS.between(startDate, today);
+        if (daysSinceStart < 0) return baseDifficulty;
+        long seasonDay = daysSinceStart + 1;
         TreeMap<Long, String> stages = new TreeMap<>();
         for (String entry : configuredStages.split(",")) {
             String[] parts = entry.trim().split(":", 2);
