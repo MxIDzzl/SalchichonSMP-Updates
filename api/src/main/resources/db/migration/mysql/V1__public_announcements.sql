@@ -11,4 +11,4 @@ CREATE TABLE IF NOT EXISTS public_announcements (
     CONSTRAINT chk_public_announcements_expiry
         CHECK (expires_at IS NULL OR expires_at > published_at),
     INDEX idx_public_announcements_visible (is_published, published_at DESC, id DESC)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
