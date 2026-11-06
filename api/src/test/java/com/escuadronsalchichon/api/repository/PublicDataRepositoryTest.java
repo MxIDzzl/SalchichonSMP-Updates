@@ -28,6 +28,17 @@ class PublicDataRepositoryTest {
                 PublicDataRepository.orderBy("value DESC; DROP TABLE player_data"));
     }
     @Test
+    void clanSortUsesOnlyAllowlistedExpressions() {
+        assertEquals("points DESC, name ASC", PublicDataRepository.clanOrderBy("points"));
+        assertEquals("kills DESC, name ASC", PublicDataRepository.clanOrderBy("kills"));
+        assertEquals("member_count DESC, name ASC", PublicDataRepository.clanOrderBy("members"));
+        assertEquals("level DESC, name ASC", PublicDataRepository.clanOrderBy("level"));
+        assertEquals("name ASC", PublicDataRepository.clanOrderBy("name"));
+        assertEquals("points DESC, name ASC",
+                PublicDataRepository.clanOrderBy("points DESC; DROP TABLE public_clans"));
+    }
+
+    @Test
     void onlyExposesValidatedSkinTextureHashes() {
         assertEquals("abcdef0123456789abcdef0123456789",
                 PublicDataRepository.normalizeSkinTextureHash("ABCDEF0123456789ABCDEF0123456789"));
