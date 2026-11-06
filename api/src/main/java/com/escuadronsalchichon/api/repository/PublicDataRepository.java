@@ -15,6 +15,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 @Repository
 public class PublicDataRepository {
@@ -102,17 +106,17 @@ public class PublicDataRepository {
         if (rows.isEmpty()) return Optional.empty();
 
         List<ClanMemberResponse> members = jdbc.query("""
-                SELECT pcm.player_uuid, COALESCE(pd.username, CAST(pcm.player_uuid AS VARCHAR)) AS username,
+                SELECT pcm.player_uuid, COALESCE(pd.username, CAST(pcm.player_uuid AS CHAR)) AS username,
                        pcm.rank_id, pcm.joined_at, pcm.kills, pcm.deaths, pcm.kdr
                 FROM player_clan_memberships pcm
                 LEFT JOIN player_data pd ON pd.uuid = pcm.player_uuid
                 WHERE pcm.clan_uuid = ? AND pcm.is_active = TRUE
                 ORDER BY pcm.rank_id DESC, username ASC
                 """, (rs, row) -> new ClanMemberResponse(
-                rs.getObject("player_uuid", UUID.class),
+                UUID.fromString(rs.getString("player_uuid")),
                 rs.getString("username"),
                 rs.getString("rank_id"),
-                rs.getObject("joined_at", java.time.OffsetDateTime.class).toInstant(),
+                instant(rs.getTimestamp("joined_at")),
                 rs.getLong("kills"),
                 rs.getLong("deaths"),
                 rs.getDouble("kdr")
@@ -122,12 +126,12 @@ public class PublicDataRepository {
 
     private ClanSummaryResponse mapClanSummary(ResultSet rs, int row) throws SQLException {
         return new ClanSummaryResponse(
-                rs.getObject("clan_uuid", UUID.class),
+                uuidOrNull(rs.getString("clan_uuid")),
                 rs.getString("name"),
                 rs.getString("tag"),
                 rs.getString("description"),
-                rs.getObject("leader_uuid", UUID.class),
-                rs.getObject("created_at", java.time.OffsetDateTime.class).toInstant(),
+                UUID.fromString(rs.getString("leader_uuid")),
+                instant(rs.getTimestamp("created_at")),
                 rs.getInt("member_count"),
                 rs.getInt("max_members"),
                 rs.getLong("points"),
@@ -173,8 +177,8 @@ public class PublicDataRepository {
                 rs.getString("title"),
                 rs.getString("body"),
                 rs.getString("category"),
-                rs.getObject("published_at", java.time.OffsetDateTime.class),
-                rs.getObject("expires_at", java.time.OffsetDateTime.class)
+                offsetDateTime(rs.getTimestamp("published_at")),
+                offsetDateTime(rs.getTimestamp("expires_at"))
         ), limit);
     }
 
@@ -193,7 +197,7 @@ public class PublicDataRepository {
                 rs.getString("title"),
                 rs.getString("body"),
                 rs.getString("category"),
-                rs.getObject("scheduled_at", java.time.OffsetDateTime.class),
+                offsetDateTime(rs.getTimestamp("scheduled_at")),
                 rs.getBoolean("is_teaser")
         ));
         return updates.stream().findFirst();
@@ -202,6 +206,14 @@ public class PublicDataRepository {
     public boolean databaseReady() {
         Integer result = jdbc.queryForObject("SELECT 1", Integer.class);
         return result != null && result == 1;
+    }
+
+    private static UUID uuidOrNull(String value) { return value == null ? null : UUID.fromString(value); }
+
+    private static Instant instant(Timestamp value) { return value == null ? null : value.toInstant(); }
+
+    private static OffsetDateTime offsetDateTime(Timestamp value) {
+        return value == null ? null : value.toInstant().atOffset(ZoneOffset.UTC);
     }
 
     static String normalizeSkinTextureHash(String textureHash) {
