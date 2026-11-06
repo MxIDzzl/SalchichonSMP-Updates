@@ -102,7 +102,7 @@ public class PublicDataRepository {
                        max_members, points, level, kills, deaths, kdr
                 FROM public_clans
                 WHERE clan_uuid = ? AND is_active = TRUE
-                """, this::mapClanSummary, uuid);
+                """, this::mapClanSummary, uuid.toString());
         if (rows.isEmpty()) return Optional.empty();
 
         List<ClanMemberResponse> members = jdbc.query("""
@@ -120,7 +120,7 @@ public class PublicDataRepository {
                 rs.getLong("kills"),
                 rs.getLong("deaths"),
                 rs.getDouble("kdr")
-        ), uuid);
+        ), uuid.toString());
         return Optional.of(new ClanDetailResponse(rows.get(0), members));
     }
 
