@@ -1,6 +1,9 @@
 package com.escuadronsalchichon.api.repository;
 
 import com.escuadronsalchichon.api.dto.AnnouncementResponse;
+import com.escuadronsalchichon.api.dto.ClanDetailResponse;
+import com.escuadronsalchichon.api.dto.ClanMemberResponse;
+import com.escuadronsalchichon.api.dto.ClanSummaryResponse;
 import com.escuadronsalchichon.api.dto.PlayerSummaryResponse;
 import com.escuadronsalchichon.api.dto.UpcomingUpdateResponse;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -40,10 +43,16 @@ public class PublicDataRepository {
                 SELECT pd.uuid, pd.username, pskin.texture_hash AS skin_texture_hash, pd.last_death_date, pd.totem_uses,
                        COALESCE(ps.official_deaths, 0) AS official_deaths,
                        COALESCE(ps.playtime_ticks, 0) AS playtime_ticks,
-                       COALESCE(ps.player_value, 0) AS player_value
+                       COALESCE(ps.player_value, 0) AS player_value,
+                       pc.clan_uuid, pc.name AS clan_name, pc.tag AS clan_tag,
+                       pc.level AS clan_level, pcm.rank_id AS clan_rank
                 FROM player_data pd
                 LEFT JOIN player_stats ps ON ps.player_uuid = pd.uuid
                 LEFT JOIN player_skins pskin ON pskin.player_uuid = pd.uuid
+                LEFT JOIN player_clan_memberships pcm
+                    ON pcm.player_uuid = pd.uuid AND pcm.is_active = TRUE
+                LEFT JOIN public_clans pc
+                    ON pc.clan_uuid = pcm.clan_uuid AND pc.is_active = TRUE
                 ORDER BY %s
                 LIMIT ? OFFSET ?
                 """.formatted(orderBy);
@@ -55,13 +64,78 @@ public class PublicDataRepository {
                 SELECT pd.uuid, pd.username, pskin.texture_hash AS skin_texture_hash, pd.last_death_date, pd.totem_uses,
                        COALESCE(ps.official_deaths, 0) AS official_deaths,
                        COALESCE(ps.playtime_ticks, 0) AS playtime_ticks,
-                       COALESCE(ps.player_value, 0) AS player_value
+                       COALESCE(ps.player_value, 0) AS player_value,
+                       pc.clan_uuid, pc.name AS clan_name, pc.tag AS clan_tag,
+                       pc.level AS clan_level, pcm.rank_id AS clan_rank
                 FROM player_data pd
                 LEFT JOIN player_stats ps ON ps.player_uuid = pd.uuid
                 LEFT JOIN player_skins pskin ON pskin.player_uuid = pd.uuid
+                LEFT JOIN player_clan_memberships pcm
+                    ON pcm.player_uuid = pd.uuid AND pcm.is_active = TRUE
+                LEFT JOIN public_clans pc
+                    ON pc.clan_uuid = pcm.clan_uuid AND pc.is_active = TRUE
                 WHERE pd.uuid = ?
                 """, (rs, row) -> mapPlayer(rs, today), uuid);
         return rows.stream().findFirst();
+    }
+
+    public List<ClanSummaryResponse> findClans(int limit, int offset, String sort) {
+        String orderBy = clanOrderBy(sort);
+        String sql = """
+                SELECT clan_uuid, name, tag, description, leader_uuid, created_at, member_count,
+                       max_members, points, level, kills, deaths, kdr
+                FROM public_clans
+                WHERE is_active = TRUE
+                ORDER BY %s
+                LIMIT ? OFFSET ?
+                """.formatted(orderBy);
+        return jdbc.query(sql, this::mapClanSummary, limit, offset);
+    }
+
+    public Optional<ClanDetailResponse> findClan(UUID uuid) {
+        List<ClanSummaryResponse> rows = jdbc.query("""
+                SELECT clan_uuid, name, tag, description, leader_uuid, created_at, member_count,
+                       max_members, points, level, kills, deaths, kdr
+                FROM public_clans
+                WHERE clan_uuid = ? AND is_active = TRUE
+                """, this::mapClanSummary, uuid);
+        if (rows.isEmpty()) return Optional.empty();
+
+        List<ClanMemberResponse> members = jdbc.query("""
+                SELECT pcm.player_uuid, COALESCE(pd.username, CAST(pcm.player_uuid AS VARCHAR)) AS username,
+                       pcm.rank_id, pcm.joined_at, pcm.kills, pcm.deaths, pcm.kdr
+                FROM player_clan_memberships pcm
+                LEFT JOIN player_data pd ON pd.uuid = pcm.player_uuid
+                WHERE pcm.clan_uuid = ? AND pcm.is_active = TRUE
+                ORDER BY pcm.rank_id DESC, username ASC
+                """, (rs, row) -> new ClanMemberResponse(
+                rs.getObject("player_uuid", UUID.class),
+                rs.getString("username"),
+                rs.getString("rank_id"),
+                rs.getObject("joined_at", java.time.OffsetDateTime.class).toInstant(),
+                rs.getLong("kills"),
+                rs.getLong("deaths"),
+                rs.getDouble("kdr")
+        ), uuid);
+        return Optional.of(new ClanDetailResponse(rows.get(0), members));
+    }
+
+    private ClanSummaryResponse mapClanSummary(ResultSet rs, int row) throws SQLException {
+        return new ClanSummaryResponse(
+                rs.getObject("clan_uuid", UUID.class),
+                rs.getString("name"),
+                rs.getString("tag"),
+                rs.getString("description"),
+                rs.getObject("leader_uuid", UUID.class),
+                rs.getObject("created_at", java.time.OffsetDateTime.class).toInstant(),
+                rs.getInt("member_count"),
+                rs.getInt("max_members"),
+                rs.getLong("points"),
+                rs.getInt("level"),
+                rs.getLong("kills"),
+                rs.getLong("deaths"),
+                rs.getDouble("kdr")
+        );
     }
 
     private PlayerSummaryResponse mapPlayer(ResultSet rs, LocalDate today) throws SQLException {
@@ -76,7 +150,12 @@ public class PublicDataRepository {
                 rs.getLong("totem_uses"),
                 rs.getLong("official_deaths"),
                 rs.getLong("playtime_ticks"),
-                rs.getBigDecimal("player_value").toPlainString()
+                rs.getBigDecimal("player_value").toPlainString(),
+                rs.getObject("clan_uuid", UUID.class),
+                rs.getString("clan_name"),
+                rs.getString("clan_tag"),
+                rs.getObject("clan_level", Integer.class),
+                rs.getString("clan_rank")
         );
     }
 
@@ -140,6 +219,16 @@ public class PublicDataRepository {
             case "playtime" -> "playtime_ticks DESC, pd.uuid ASC";
             case "totems" -> "pd.totem_uses DESC, pd.uuid ASC";
             default -> "player_value DESC, pd.uuid ASC";
+        };
+    }
+
+    static String clanOrderBy(String sort) {
+        return switch (sort == null ? "points" : sort.toLowerCase(java.util.Locale.ROOT)) {
+            case "kills" -> "kills DESC, name ASC";
+            case "members" -> "member_count DESC, name ASC";
+            case "level" -> "level DESC, name ASC";
+            case "name" -> "name ASC";
+            default -> "points DESC, name ASC";
         };
     }
 
