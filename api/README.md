@@ -5,7 +5,7 @@ Servicio Spring Boot independiente para el portal público y una superficie admi
 ## Requisitos
 - Java 25
 - Maven 3.9+
-- MySQL 8.4 recomendado
+- MySQL 8.4 y MariaDB 11.4 están cubiertos por CI; el motor y versión reales del hosting se registran al iniciar la API.
 - Esquema MySQL del plugin y migraciones API V1-V5 aplicadas
 - Un usuario runtime público con permisos SELECT solamente (ejemplo en `docs/public-role-grants.example.sql`)
 
@@ -33,7 +33,7 @@ mvn -f api/pom.xml clean verify
 mvn -f api/pom.xml spring-boot:run
 ```
 
-GitHub Actions levanta MySQL 8.4 y ejecuta pruebas de integración del repositorio público y de las migraciones. Para ejecutar esas pruebas localmente, define `SALCHICHON_MYSQL_TEST_URL`, `SALCHICHON_MYSQL_TEST_USER` y `SALCHICHON_MYSQL_TEST_PASSWORD`.
+GitHub Actions levanta MySQL 8.4 y MariaDB 11.4 en una matriz independiente; las 25 pruebas pasan en ambos motores. Esto valida las versiones de CI, no sustituye la comprobación de la versión exacta del proveedor. Para ejecutar esas pruebas localmente, define `SALCHICHON_MYSQL_TEST_URL`, `SALCHICHON_MYSQL_TEST_USER` y `SALCHICHON_MYSQL_TEST_PASSWORD`.
 
 ## Endpoints públicos v1
 - `GET /api/v1/health/live`
