@@ -55,8 +55,8 @@ public class AdminPlayerStatsController {
             if (player.isEmpty()) return null;
 
             jdbc.update("""
-                    INSERT INTO player_stats(player_uuid, official_deaths, playtime_ticks, player_value, updated_at)
-                    VALUES (?, 0, 0, 0, now())
+                    INSERT INTO player_stats(player_uuid, official_deaths, playtime_ticks, updated_at)
+                    VALUES (?, 0, 0, UTC_TIMESTAMP(6))
                     ON DUPLICATE KEY UPDATE player_uuid = VALUES(player_uuid)
                     """, uuid.toString());
 
@@ -64,7 +64,7 @@ public class AdminPlayerStatsController {
                     "SELECT " + column + " FROM player_stats WHERE player_uuid = ? FOR UPDATE",
                     Long.class, uuid.toString());
             int changed = jdbc.update(
-                    "UPDATE player_stats SET " + column + " = ?, updated_at = now() WHERE player_uuid = ?",
+                    "UPDATE player_stats SET " + column + " = ?, updated_at = UTC_TIMESTAMP(6) WHERE player_uuid = ?",
                     request.value(), uuid.toString());
             if (changed != 1) throw new IllegalStateException("Player statistic update was not applied");
 
