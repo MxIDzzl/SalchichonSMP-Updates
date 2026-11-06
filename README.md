@@ -1,36 +1,59 @@
-# Escuadrón Salchichón — Portal oficial
+# ✦ ESCUADRÓN SALCHICHÓN SMP ✦
 
-Este repositorio contiene dos servicios desplegables por separado:
-- `/`: portal Next.js público y futura consola administrativa.
-- `api/`: servicio Spring Boot independiente para datos públicos del servidor.
+<div align="center">
 
-El plugin Paper sigue en su propio repositorio. La API y la web comparten este repositorio por ahora, pero cada una tiene su propio proceso de build y despliegue.
+### Portal oficial · API · Actualizaciones
 
-## Web
-Requiere Node.js 20.9+.
+*La información pública del servidor, sus jugadores y su comunidad.*
+
+</div>
+
+Este repositorio contiene dos servicios separados:
+
+- **Portal Next.js:** portada, estadísticas, directorio y perfiles de jugadores, rankings, clanes y archivo de novedades.
+- **API Spring Boot:** lectura pública de datos de PostgreSQL y endpoints administrativos privados, desactivados por defecto.
+
+El plugin Paper vive en [SalchichonHardcore](https://github.com/MxIDzzl/SalchichonHardcore). La web no administra clanes ni intercambios: lee el snapshot oficial de zMClans y las estadísticas del plugin; los trades siguen a cargo del plugin externo del servidor.
+
+## Estado del portal
+
+La portada y las páginas públicas muestran información real cuando la API está conectada. Si faltan datos, se indica que aún no están sincronizados; no se rellenan cifras, temporadas ni clanes ficticios.
+
+La dificultad puede avanzar automáticamente por día de temporada mediante la configuración de etapas de la API. Esta primera fase solo publica la etapa actual; los niveles y atributos especiales de mobs quedan para una fase posterior.
+
+## Despliegue
+
+Consulta [DEPLOYMENT.md](DEPLOYMENT.md) para los requisitos, orden de despliegue, variables de entorno, permisos de PostgreSQL y verificaciones de aceptación.
+
+## Desarrollo
+
+Web:
 ```bash
 npm install
 npm run dev
+npm run build
 ```
-Configura `SALCHICHON_API_URL` como variable de entorno del servidor Next.js (por ejemplo `http://127.0.0.1:8080`). Es una URL server-side; no colocar secretos en variables `NEXT_PUBLIC_*`.
 
-## Despliegue independiente de la web
-
-La web incluye un Dockerfile multi-stage y se ejecuta como proceso independiente:
-```bash
-docker build -t salchichon-web .
-docker run --rm -p 3000:3000 -e SALCHICHON_API_URL=http://host.docker.internal:8080 salchichon-web
-```
-En Linux, configura la dirección privada real de la API en `SALCHICHON_API_URL`; no publiques esta variable como `NEXT_PUBLIC_*`. Termina TLS en un proxy inverso y limita el acceso de red entre web y API.
-
-## API
-Requiere Java 25, Maven 3.9+ y PostgreSQL.
+API:
 ```bash
 cd api
 mvn clean verify
 mvn spring-boot:run
 ```
-Consulta `api/README.md` para endpoints, variables de entorno, CORS y permisos PostgreSQL.
 
-## Seguridad y estado
-La web consulta la API desde el servidor Next.js; no se conecta directamente a PostgreSQL. La API pública es de solo lectura y debe usar un rol PostgreSQL SELECT-only. No expongas PostgreSQL a internet. El panel administrativo todavía no permite mutaciones; faltan autenticación, autorización y auditoría. La validación de licencias del plugin también está pendiente.
+La web consulta la API desde el servidor mediante `SALCHICHON_API_URL`. Nunca expongas credenciales de PostgreSQL ni tokens en variables `NEXT_PUBLIC_*`.
+
+## Seguridad y límites de la primera publicación
+
+- PostgreSQL debe permanecer privado.
+- La API pública utiliza un rol SELECT-only.
+- El panel /admin permanece sin operaciones y la API administrativa desactivada hasta completar autenticación y autorización reales.
+- Player Value permanece desactivado hasta terminar la GUI tipo cofre y las pruebas de recuperación.
+- Los intercambios los gestiona el plugin externo.
+- La sincronización de clanes es de solo lectura desde zMClans.
+
+## Enlaces
+
+- [Plugin Paper](https://github.com/MxIDzzl/SalchichonHardcore)
+- [Workflow de API](https://github.com/MxIDzzl/SalchichonSMP-Updates/actions/workflows/api-ci.yml)
+- [Workflow de web](https://github.com/MxIDzzl/SalchichonSMP-Updates/actions/workflows/web-ci.yml)
