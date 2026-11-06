@@ -6,4 +6,4 @@ CREATE TABLE IF NOT EXISTS player_skins (
         CHECK (CHAR_LENGTH(texture_hash) BETWEEN 32 AND 64),
     CONSTRAINT fk_player_skins_player
         FOREIGN KEY (player_uuid) REFERENCES player_data(uuid) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
