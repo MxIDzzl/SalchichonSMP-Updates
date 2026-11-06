@@ -11,6 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.validation.annotation.Validated;
@@ -77,14 +82,7 @@ public class AdminAnnouncementController {
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, Object> create(@Valid @RequestBody CreateAnnouncement request) {
         Long id = transaction.execute(status -> {
-            Long created = jdbc.queryForObject("""
-                    INSERT INTO public_announcements
-                        (title, body, category, is_published, published_at, expires_at, scheduled_at, is_teaser, created_by)
-                    VALUES (?, ?, ?, ?, COALESCE(?, now()), ?, ?, ?, ?)
-                    RETURNING id
-                    """, Long.class, request.title().trim(), request.body().trim(), request.category(),
-                    request.published(), request.publishedAt(), request.expiresAt(), request.scheduledAt(),
-                    request.teaser(), actor);
+            Long created = insertAnnouncement(request);
             audit("ANNOUNCEMENT_CREATED", created, request.reason(),
                     Map.of("published", request.published(), "category", request.category()));
             return created;
@@ -110,10 +108,35 @@ public class AdminAnnouncementController {
         return Map.of("id", id, "published", request.published());
     }
 
+    private Long insertAnnouncement(CreateAnnouncement request) {
+        String sql = """
+                INSERT INTO public_announcements
+                    (title, body, category, is_published, published_at, expires_at, scheduled_at, is_teaser, created_by)
+                VALUES (?, ?, ?, ?, COALESCE(?, now()), ?, ?, ?, ?)
+                """;
+        KeyHolder keys = new GeneratedKeyHolder();
+        jdbc.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, request.title().trim());
+            statement.setString(2, request.body().trim());
+            statement.setString(3, request.category());
+            statement.setBoolean(4, request.published());
+            statement.setObject(5, request.publishedAt());
+            statement.setObject(6, request.expiresAt());
+            statement.setObject(7, request.scheduledAt());
+            statement.setBoolean(8, request.teaser());
+            statement.setString(9, actor);
+            return statement;
+        }, keys);
+        Number key = keys.getKey();
+        if (key == null) throw new IllegalStateException("Announcement insert did not return an id");
+        return key.longValue();
+    }
+
     private void audit(String action, long entityId, String reason, Map<String, Object> details) {
         jdbc.update("""
                 INSERT INTO public_admin_audit(actor, action, entity_type, entity_id, reason, details)
-                VALUES (?, ?, 'ANNOUNCEMENT', ?, ?, CAST(? AS jsonb))
+                VALUES (?, ?, 'ANNOUNCEMENT', ?, ?, ?)
                 """, actor, action, entityId, reason.trim(), toJson(details));
     }
 
