@@ -52,6 +52,7 @@ public class AdminDataSourceConfiguration {
         config.setMinimumIdle(0);
         config.setReadOnly(false);
         config.setConnectionTimeout(10_000);
+        config.setConnectionInitSql("SET time_zone = '+00:00'");
         config.setInitializationFailTimeout(10_000);
         dataSource = new HikariDataSource(config);
         return dataSource;
