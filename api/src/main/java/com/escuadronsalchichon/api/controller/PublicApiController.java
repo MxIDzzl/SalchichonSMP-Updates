@@ -1,6 +1,8 @@
 package com.escuadronsalchichon.api.controller;
 
 import com.escuadronsalchichon.api.dto.AnnouncementResponse;
+import com.escuadronsalchichon.api.dto.ClanDetailResponse;
+import com.escuadronsalchichon.api.dto.ClanSummaryResponse;
 import com.escuadronsalchichon.api.dto.OverviewResponse;
 import com.escuadronsalchichon.api.dto.PlayerSummaryResponse;
 import com.escuadronsalchichon.api.dto.UpcomingUpdateResponse;
@@ -67,6 +69,22 @@ public class PublicApiController {
     public PlayerSummaryResponse player(@PathVariable UUID uuid) {
         return repository.findPlayer(uuid, LocalDate.now(serverZone))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
+    }
+
+    @GetMapping("/public/clans")
+    public List<ClanSummaryResponse> clans(
+            @RequestParam(defaultValue = "20") int limit,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "points") String sort
+    ) {
+        validatePage(limit, offset);
+        return repository.findClans(limit, offset, sort);
+    }
+
+    @GetMapping("/public/clans/{uuid}")
+    public ClanDetailResponse clan(@PathVariable UUID uuid) {
+        return repository.findClan(uuid)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Clan not found"));
     }
 
     @GetMapping("/public/announcements")
