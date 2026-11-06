@@ -30,6 +30,7 @@ salchichon:
     name: ${SALCHICHON_SEASON_NAME:TEMPORADA SIN SINCRONIZAR}
     description: ${SALCHICHON_SEASON_DESCRIPTION:La información oficial de la temporada aún no está sincronizada.}
     difficulty: ${SALCHICHON_SEASON_DIFFICULTY:—}
+    difficulty-stages: ${SALCHICHON_SEASON_DIFFICULTY_STAGES:}
     start-date: ${SALCHICHON_SEASON_START_DATE:—}
   server:
     timezone: ${SALCHICHON_SERVER_TIMEZONE:America/Mexico_City}
