@@ -20,6 +20,12 @@ export default async function PlayerProfile({ params }: { params: Promise<{ user
         <article><small>TÓTEMS UTILIZADOS</small><strong>{player.totemUses.toLocaleString("es-MX")}</strong></article>
         <article><small>ESTADO DE VIDA</small><strong className={player.hasLife ? "life-available" : "life-unavailable"}>{player.hasLife ? "DISPONIBLE" : "SIN VIDA"}</strong></article>
       </section>
+      <section className="profile-extra clan-profile-link">
+        <b>CLAN</b>
+        {player.clanName && player.clanUuid
+          ? <><h2><Link href={`/clans/${player.clanUuid}`}>{player.clanTag ? `[${player.clanTag}] ` : ""}{player.clanName}</Link></h2><p>Nivel {player.clanLevel ?? "—"} · Rango {player.clanRank ?? "—"}</p></>
+          : <><h2>Sin clan</h2><p>Este jugador no tiene una membresía activa sincronizada.</p></>}
+      </section>
       <section className="empty profile-extra"><b>ÚLTIMA MUERTE</b><h2>{player.lastDeathDate ?? "Sin registro"}</h2><p>La skin se obtiene del perfil sincronizado por SkinsRestorer cuando el jugador entra al servidor.</p></section>
     </> : <><header><small>PERFIL DE JUGADOR</small><h1>Perfil no disponible.</h1><p>No se encontró el UUID solicitado o la API todavía no está conectada.</p></header><section className="empty"><b>DATOS NO DISPONIBLES</b><p>No se han cargado estadísticas ni skin para este perfil. No se mostrarán datos inventados.</p></section></>}
   </main>;
