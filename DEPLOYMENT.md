@@ -11,7 +11,7 @@ La web y la API son servicios separados. El navegador solo habla con Next.js; Ne
 
 ## Orden de despliegue futuro (solo staging hasta aprobar los gates)
 1. Confirmar la versión exacta de MySQL/MariaDB del proveedor y que permite conexiones desde los procesos Paper y API.
-2. Crear una base MySQL vacía y un usuario de escritura para el plugin. Si el proveedor permite cuentas separadas, aplicar [plugin-role-grants.example.sql](api/docs/plugin-role-grants.example.sql) y limitar el host al servidor Paper. Mantener SQLite intacta y respaldada.
+2. Crear una base MySQL vacía y un usuario de escritura para el plugin. Si el proveedor permite cuentas separadas, aplicar [plugin-role-grants.example.sql](https://github.com/MxIDzzl/SalchichonSMP-Updates/blob/6e65d19e13a6d27d2048dc092cff20a714d71839/api/docs/plugin-role-grants.example.sql) y limitar el host al servidor Paper. Mantener SQLite intacta y respaldada.
 3. Instalar SalchichonHardcore en un servidor de staging; habilitar `database.mysql.enabled: true`. Si se importa la base anterior, habilitar `database.mysql.import-sqlite-on-startup: true` solo para el primer arranque. El importador exige destino vacío, valida SQLite, copia y verifica conteos/IDs, y restablece el indicador tras éxito.
 4. Aplicar migraciones API V1-V5 con credenciales DDL separadas y baseline 0.
 5. Crear el usuario de solo lectura usando [public-role-grants.example.sql](api/docs/public-role-grants.example.sql).
