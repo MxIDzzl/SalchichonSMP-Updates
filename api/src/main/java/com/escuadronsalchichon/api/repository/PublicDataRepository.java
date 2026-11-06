@@ -142,7 +142,7 @@ public class PublicDataRepository {
         LocalDate lastDeathDate = rs.getObject("last_death_date", LocalDate.class);
         boolean hasLife = hasLifeOn(lastDeathDate, today);
         return new PlayerSummaryResponse(
-                rs.getObject("uuid", UUID.class),
+                UUID.fromString(rs.getString("uuid")),
                 rs.getString("username"),
                 normalizeSkinTextureHash(rs.getString("skin_texture_hash")),
                 lastDeathDate,
