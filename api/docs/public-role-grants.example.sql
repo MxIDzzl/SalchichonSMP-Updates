@@ -1,4 +1,4 @@
--- Run as the PostgreSQL database owner after the plugin schema and API V1-V4
+-- Run as the PostgreSQL database owner after the plugin schema and API V1-V5
 -- migrations have been applied. Replace the password before execution.
 CREATE ROLE salchichon_readonly LOGIN PASSWORD 'REPLACE_WITH_A_LONG_RANDOM_PASSWORD';
 
