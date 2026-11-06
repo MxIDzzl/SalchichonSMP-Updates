@@ -97,7 +97,7 @@ public class AdminAnnouncementController {
         Boolean updated = transaction.execute(status -> {
             int changed = jdbc.update("""
                     UPDATE public_announcements
-                    SET is_published = ?, published_at = CASE WHEN ? THEN COALESCE(published_at, now()) ELSE published_at END
+                    SET is_published = ?, published_at = CASE WHEN ? THEN COALESCE(published_at, UTC_TIMESTAMP(6)) ELSE published_at END
                     WHERE id = ?
                     """, request.published(), request.published(), id);
             if (changed == 0) return false;
@@ -117,7 +117,7 @@ public class AdminAnnouncementController {
         String sql = """
                 INSERT INTO public_announcements
                     (title, body, category, is_published, published_at, expires_at, scheduled_at, is_teaser, created_by)
-                VALUES (?, ?, ?, ?, COALESCE(?, now()), ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, COALESCE(?, UTC_TIMESTAMP(6)), ?, ?, ?, ?)
                 """;
         KeyHolder keys = new GeneratedKeyHolder();
         jdbc.update(connection -> {
