@@ -7,6 +7,7 @@ export type Overview = {
   seasonDescription: string;
   difficulty: string;
   seasonStartDate: string;
+  seasonDay: number;
   generatedAt: string;
 };
 
