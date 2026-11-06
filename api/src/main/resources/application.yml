@@ -1,0 +1,44 @@
+server:
+  port: ${PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+
+spring:
+  application:
+    name: salchichon-api
+  datasource:
+    url: ${SALCHICHON_API_DB_URL:jdbc:mysql://127.0.0.1:3306/salchichon?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC}
+    username: ${SALCHICHON_API_DB_USER:salchichon_readonly}
+    password: ${SALCHICHON_API_DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: 8
+      minimum-idle: 1
+      read-only: true
+      connection-timeout: 10000
+      connection-init-sql: SET time_zone = '+00:00'
+  flyway:
+    enabled: ${SALCHICHON_API_FLYWAY_ENABLED:false}
+    baseline-on-migrate: true
+    baseline-version: 0
+    url: ${SALCHICHON_API_MIGRATION_DB_URL:${SALCHICHON_API_DB_URL:jdbc:mysql://127.0.0.1:3306/salchichon?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC}}
+    user: ${SALCHICHON_API_MIGRATION_DB_USER:${SALCHICHON_API_DB_USER:salchichon_readonly}}
+    password: ${SALCHICHON_API_MIGRATION_DB_PASSWORD:${SALCHICHON_API_DB_PASSWORD:}}
+    locations: classpath:db/migration/mysql
+
+salchichon:
+  web:
+    allowed-origins: ${SALCHICHON_WEB_ORIGINS:http://localhost:3000}
+  season:
+    name: ${SALCHICHON_SEASON_NAME:TEMPORADA SIN SINCRONIZAR}
+    description: ${SALCHICHON_SEASON_DESCRIPTION:La información oficial de la temporada aún no está sincronizada.}
+    difficulty: ${SALCHICHON_SEASON_DIFFICULTY:—}
+    difficulty-stages: ${SALCHICHON_SEASON_DIFFICULTY_STAGES:}
+    start-date: ${SALCHICHON_SEASON_START_DATE:—}
+  server:
+    timezone: ${SALCHICHON_SERVER_TIMEZONE:America/Mexico_City}
+
+  admin:
+    enabled: ${SALCHICHON_ADMIN_ENABLED:false}
+    token: ${SALCHICHON_ADMIN_TOKEN:}
+    actor: ${SALCHICHON_ADMIN_ACTOR:configured-admin}
