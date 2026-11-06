@@ -20,6 +20,15 @@ La web y la API son servicios separados. El navegador solo habla con Next.js; Ne
 8. Verificar portada, directorio, perfiles, Player Value (solo lectura si sigue desactivado), rankings, clanes, skins, anuncios y próxima actualización.
 9. Ensayar backup/restore, reconexión, recuperación ante interrupciones y rollback a SQLite antes de cualquier corte de producción.
 
+## Campos del panel de hosting MySQL
+
+- **Endpoint:** host y puerto que entrega el proveedor; usa el host en la URL JDBC y conserva el puerto indicado (normalmente 3306).
+- **Connections from:** permite únicamente la IP de salida del servidor Paper y la del proceso API. No hace falta permitir el navegador ni las IP de los jugadores.
+- **Username / Password:** guárdalos como variables de entorno del servicio; no los publiques en repositorios ni en el chat.
+- **JDBC Connection String:** úsala como base para `database.mysql.jdbc-url` del plugin y `SALCHICHON_API_DB_URL` de la API, cambiando solo parámetros si el proveedor exige alguno.
+
+Si el panel genera una sola cuenta por base de datos y no permite cuentas/grants separados, ambos procesos podrían tener que compartir credenciales. La API mantiene Hikari en modo read-only, pero eso no sustituye los permisos SELECT-only de MySQL; considera esa limitación antes de producción.
+
 ## MySQL
 
 - La base de datos debe ser privada y accesible solo desde Paper y la API.
