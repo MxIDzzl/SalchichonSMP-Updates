@@ -31,6 +31,8 @@ Si el panel genera una sola cuenta por base de datos y no permite cuentas/grants
 
 ## MySQL
 
+Las suites de integración del plugin y la API pasan contra MySQL 8.4 y MariaDB 11.4. Eso valida esas versiones de CI, pero no identifica el motor del proveedor: el plugin y la API registran el nombre y la versión reales en sus logs privados al conectarse. Confirma ese dato en staging antes de producción.
+
 - La base de datos debe ser privada y accesible solo desde Paper y la API.
 - El usuario del plugin necesita los permisos de escritura que requiere SalchichonHardcore; el ejemplo de grants evita conceder `DROP`, `ALTER` o `GRANT OPTION`.
 - La API pública debe usar exclusivamente el rol SELECT-only del archivo de ejemplo.
