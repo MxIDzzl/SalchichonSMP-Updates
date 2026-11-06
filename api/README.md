@@ -6,7 +6,7 @@ Servicio Spring Boot independiente para el portal público y una superficie admi
 - Java 25
 - Maven 3.9+
 - PostgreSQL con el esquema del plugin v1-v6 y las migraciones API V1-V4 aplicadas
-- Rol runtime de solo lectura para la API pública
+- Rol runtime de solo lectura para la API pública (ejemplo en `docs/public-role-grants.example.sql`)
 
 ## Configuración
 Variables de entorno:
@@ -19,7 +19,7 @@ Variables de entorno:
 - `SALCHICHON_ADMIN_ENABLED` (por defecto false), `SALCHICHON_ADMIN_TOKEN` (mínimo 32 caracteres aleatorios), `SALCHICHON_ADMIN_ACTOR` (identidad de auditoría del servidor)
 - `SALCHICHON_ADMIN_DB_URL`, `SALCHICHON_ADMIN_DB_USER`, `SALCHICHON_ADMIN_DB_PASSWORD` (pool privado de escritura)
 
-No usar el usuario administrador de PostgreSQL como credencial runtime. El pool público permanece read-only. Flyway está desactivado por defecto y usa credenciales de migración separadas.
+No usar el usuario administrador de PostgreSQL como credencial runtime. El pool público permanece read-only. El ejemplo `docs/public-role-grants.example.sql` limita el rol público a SELECT sobre `player_data`, `player_stats`, `player_skins` y `public_announcements`; no concede escritura ni acceso a bóveda/trades. Flyway está desactivado por defecto y usa credenciales de migración separadas.
 
 ## Desarrollo
 ```bash
