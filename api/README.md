@@ -5,7 +5,7 @@ Servicio Spring Boot independiente para el portal público y una superficie admi
 ## Requisitos
 - Java 25
 - Maven 3.9+
-- PostgreSQL con el esquema del plugin v1-v6 y las migraciones API V1-V4 aplicadas
+- PostgreSQL con el esquema del plugin v1-v6 y las migraciones API V1-V5 aplicadas
 - Rol runtime de solo lectura para la API pública (ejemplo en `docs/public-role-grants.example.sql`)
 
 ## Configuración
@@ -19,7 +19,7 @@ Variables de entorno:
 - `SALCHICHON_ADMIN_ENABLED` (por defecto false), `SALCHICHON_ADMIN_TOKEN` (mínimo 32 caracteres aleatorios), `SALCHICHON_ADMIN_ACTOR` (identidad de auditoría del servidor)
 - `SALCHICHON_ADMIN_DB_URL`, `SALCHICHON_ADMIN_DB_USER`, `SALCHICHON_ADMIN_DB_PASSWORD` (pool privado de escritura)
 
-No usar el usuario administrador de PostgreSQL como credencial runtime. El pool público permanece read-only. El ejemplo `docs/public-role-grants.example.sql` limita el rol público a SELECT sobre `player_data`, `player_stats`, `player_skins` y `public_announcements`; no concede escritura ni acceso a bóveda/trades. Flyway está desactivado por defecto y usa credenciales de migración separadas.
+No usar el usuario administrador de PostgreSQL como credencial runtime. El pool público permanece read-only. El ejemplo `docs/public-role-grants.example.sql` limita el rol público a SELECT sobre `player_data`, `player_stats`, `player_skins`, `public_clans`, `player_clan_memberships` y `public_announcements`; no concede escritura ni acceso a bóveda/trades. Flyway está desactivado por defecto y usa credenciales de migración separadas.
 
 ## Desarrollo
 ```bash
@@ -32,7 +32,9 @@ mvn spring-boot:run
 - `GET /api/v1/health/ready`
 - `GET /api/v1/public/overview`
 - `GET /api/v1/public/players?limit=20&offset=0&sort=value`
-- `GET /api/v1/public/players/{uuid}` (incluye `hasLife`, calculado en la zona horaria configurada)
+- `GET /api/v1/public/players/{uuid}` (incluye `hasLife` y clan activo, calculados desde los snapshots sincronizados)
+- `GET /api/v1/public/clans?limit=20&offset=0&sort=points`
+- `GET /api/v1/public/clans/{uuid}` (incluye miembros, rangos y estadísticas de zMClans)
 - `GET /api/v1/public/announcements?limit=10`
 - `GET /api/v1/public/upcoming-update` (404 si no hay una actualización futura publicada)
 
@@ -77,4 +79,8 @@ Habilitar requiere `SALCHICHON_ADMIN_ENABLED=true`, token privado y credenciales
 La migración API V3 crea `player_skins`. El plugin sincroniza únicamente el hash público de textura de SkinsRestorer (API major 15); no se guardan firmas ni credenciales. Los perfiles sin hash permanecen sin avatar.
 
 ## Migraciones y recuperación
-Aplicar las migraciones API V1-V4 con credenciales DDL separadas. Aplicar el esquema del plugin v1-v6 tras backup verificado. PostgreSQL debe permanecer privado. No habilitar los servicios administrativos ni cambiar el plugin a PostgreSQL sin ensayos completos de recuperación.
+Aplicar las migraciones API V1-V5 con credenciales DDL separadas. Aplicar el esquema del plugin v1-v6 tras backup verificado. PostgreSQL debe permanecer privado. No habilitar los servicios administrativos ni cambiar el plugin a PostgreSQL sin ensayos completos de recuperación.
+
+
+## Sincronización de clanes
+El plugin Paper consulta el API público de zMClans en el hilo principal (como exige su contrato), crea un snapshot inmutable y lo persiste de forma transaccional cada cinco minutos. La web solo lee las tablas public_clans y player_clan_memberships; nunca gestiona invitaciones, rangos, miembros ni cambios de clan. Los registros que desaparecen del snapshot se marcan inactivos, no se borran. Si zMClans no está disponible, se conserva el último snapshot válido.
