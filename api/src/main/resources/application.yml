@@ -16,6 +16,7 @@ spring:
       minimum-idle: 1
       read-only: true
       connection-timeout: 10000
+      connection-init-sql: SET time_zone = '+00:00'
   flyway:
     enabled: ${SALCHICHON_API_FLYWAY_ENABLED:false}
     url: ${SALCHICHON_API_MIGRATION_DB_URL:${SALCHICHON_API_DB_URL:jdbc:mysql://127.0.0.1:3306/salchichon?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC}}
