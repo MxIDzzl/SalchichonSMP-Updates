@@ -19,6 +19,14 @@ class DifficultyProgressionTest {
     }
 
     @Test
+    void calculatesSeasonDayAndReturnsZeroBeforeStartOrWithoutDate() {
+        assertEquals(1, DifficultyProgression.seasonDay("2026-11-01", LocalDate.of(2026, 11, 1)));
+        assertEquals(13, DifficultyProgression.seasonDay("2026-11-01", LocalDate.of(2026, 11, 13)));
+        assertEquals(0, DifficultyProgression.seasonDay("2026-11-14", LocalDate.of(2026, 11, 13)));
+        assertEquals(0, DifficultyProgression.seasonDay("—", LocalDate.of(2026, 11, 13)));
+    }
+
+    @Test
     void usesBaseDifficultyWhenScheduleOrStartDateIsUnavailable() {
         LocalDate today = LocalDate.of(2026, 11, 13);
         assertEquals("BASE", DifficultyProgression.resolve("BASE", "2026-11-01", "", today));
