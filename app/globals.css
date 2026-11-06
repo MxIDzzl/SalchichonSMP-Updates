@@ -31,3 +31,32 @@
 
 /* SkinsRestorer stores the public Mojang texture hash; render the actual skin texture, not an offline UUID head lookup. */
 .skin-texture{width:112px;height:224px;object-fit:contain;object-position:center top;border:1px solid var(--line);border-radius:14px;background:#15121d;image-rendering:pixelated;flex:none}
+
+
+.clan-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px;max-width:1000px}
+.clan-card{display:block;padding:24px;border:1px solid var(--line);background:#15121d;color:#e8e0ec;transition:background .2s,border-color .2s}
+.clan-card:hover{background:#211a2a;border-color:rgba(255,143,163,.45)}
+.clan-card-top{display:flex;align-items:center;justify-content:space-between;color:#9a91a4;font:10px var(--mono);letter-spacing:.12em}
+.clan-card-top b{padding:7px 10px;border:1px solid rgba(255,143,163,.4);border-radius:8px;color:var(--pink)}
+.clan-card h2{margin:24px 0 8px;font-size:25px;letter-spacing:-.05em}
+.clan-card p{min-height:42px;color:#b9afc4;font-size:11px;line-height:1.7}
+.clan-card-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid var(--line)}
+.clan-card-stats span,.clan-profile-stats article{display:grid;gap:8px}
+.clan-card-stats small,.clan-profile-stats small,.clan-member-row small{font:9px var(--mono);letter-spacing:.1em;color:#938a9e}
+.clan-card-stats strong{font-size:18px}
+.clan-profile-heading{display:flex;align-items:center;gap:22px}
+.clan-emblem{display:grid;place-items:center;min-width:82px;height:82px;padding:10px;border:1px solid var(--pink);border-radius:18px;background:#211a2a;color:var(--pink);font:700 15px var(--mono);text-align:center}
+.clan-profile-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:900px}
+.clan-profile-stats article{padding:22px;border:1px solid var(--line);background:#15121d}
+.clan-profile-stats strong{font-size:28px;letter-spacing:-.05em}
+.clan-members-section{max-width:900px;margin-top:38px}
+.clan-members{margin-top:14px;border:1px solid var(--line);background:#15121d}
+.clan-member-row{display:grid;grid-template-columns:2fr repeat(3,.8fr);gap:14px;align-items:center;padding:15px 18px;border-bottom:1px solid var(--line);color:#d8d0e0}
+.clan-member-row:last-child{border-bottom:0}
+.clan-member-row:hover{background:#211a2a}
+.clan-member-row>span{display:grid;gap:5px}
+.clan-member-row>span:first-child small{color:var(--pink)}
+.clan-member-row b{font:12px var(--mono)}
+.clan-profile-link h2 a{color:#ff8fa3}
+.clan-profile-link h2 a:hover{text-decoration:underline}
+@media(max-width:650px){.clan-profile-heading{align-items:flex-start;gap:14px}.clan-emblem{min-width:60px;height:60px;font-size:12px}.clan-profile-stats{grid-template-columns:repeat(2,1fr)}.clan-profile-stats strong{font-size:23px}.clan-member-row{grid-template-columns:1.5fr .7fr .7fr .7fr;gap:7px;padding:12px 9px}.clan-member-row b{font-size:10px}.clan-member-row small{font-size:7px}}
