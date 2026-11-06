@@ -11,7 +11,7 @@ La web y la API son servicios separados. El navegador solo habla con Next.js; Ne
 
 ## Orden de despliegue futuro (solo staging hasta aprobar los gates)
 1. Confirmar la versión exacta de MySQL/MariaDB del proveedor y que permite conexiones desde los procesos Paper y API.
-2. Crear una base MySQL vacía y un usuario de escritura para el plugin. Mantener SQLite intacta y respaldada.
+2. Crear una base MySQL vacía y un usuario de escritura para el plugin. Si el proveedor permite cuentas separadas, aplicar [plugin-role-grants.example.sql](api/docs/plugin-role-grants.example.sql) y limitar el host al servidor Paper. Mantener SQLite intacta y respaldada.
 3. Instalar SalchichonHardcore en un servidor de staging; habilitar `database.mysql.enabled: true`. Si se importa la base anterior, habilitar `database.mysql.import-sqlite-on-startup: true` solo para el primer arranque. El importador exige destino vacío, valida SQLite, copia y verifica conteos/IDs, y restablece el indicador tras éxito.
 4. Aplicar migraciones API V1-V5 con credenciales DDL separadas y baseline 0.
 5. Crear el usuario de solo lectura usando [public-role-grants.example.sql](api/docs/public-role-grants.example.sql).
@@ -23,7 +23,7 @@ La web y la API son servicios separados. El navegador solo habla con Next.js; Ne
 ## MySQL
 
 - La base de datos debe ser privada y accesible solo desde Paper y la API.
-- El usuario del plugin necesita los permisos de escritura que requiere SalchichonHardcore.
+- El usuario del plugin necesita los permisos de escritura que requiere SalchichonHardcore; el ejemplo de grants evita conceder `DROP`, `ALTER` o `GRANT OPTION`.
 - La API pública debe usar exclusivamente el rol SELECT-only del archivo de ejemplo.
 - Las migraciones Flyway usan credenciales DDL independientes.
 - Si el hosting no permite crear usuarios separados, la API conserva Hikari en modo read-only, pero se pierde el aislamiento de permisos a nivel de base de datos; debe documentarse y valorarse antes de producción.
