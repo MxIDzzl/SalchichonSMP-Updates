@@ -33,7 +33,7 @@ export default async function Home() {
 
       <section className="hero wrap">
         <div className="hero-copy">
-          <div className="eyebrow"><span /> TEMPORADA ACTIVA</div>
+          <div className="eyebrow"><span /> TEMPORADA / ESTADO OFICIAL</div>
           <h1>NO ES SOLO<br /><span>SUPERVIVIR.</span></h1>
           <p className="hero-lead">Es dejar huella en un mundo donde cada día importa y cada jugador escribe su propia historia.</p>
           <div className="hero-actions">
@@ -53,7 +53,7 @@ export default async function Home() {
       <section className="season-band" id="season">
         <div className="wrap season-inner">
           <div><div className="section-kicker">01 / TEMPORADA</div><h2>{overview?.seasonName ?? "TEMPORADA SIN SINCRONIZAR"}</h2><p>{overview?.seasonDescription ?? "La temporada actual del Escuadrón Salchichón."}</p></div>
-          <div className="season-meta"><div><span>DIFICULTAD</span><strong>{overview?.difficulty ?? "—"}</strong></div><div><span>INICIO</span><strong>{overview?.seasonStartDate ?? "—"}</strong></div><div><span>ESTADO</span><strong className="live">EN CURSO</strong></div></div>
+          <div className="season-meta"><div><span>DIFICULTAD</span><strong>{overview?.difficulty ?? "—"}</strong></div><div><span>INICIO</span><strong>{overview?.seasonStartDate ?? "—"}</strong></div><div><span>ESTADO</span><strong>—</strong></div></div>
         </div>
       </section>
 
