@@ -19,6 +19,8 @@ spring:
       connection-init-sql: SET time_zone = '+00:00'
   flyway:
     enabled: ${SALCHICHON_API_FLYWAY_ENABLED:false}
+    baseline-on-migrate: true
+    baseline-version: 0
     url: ${SALCHICHON_API_MIGRATION_DB_URL:${SALCHICHON_API_DB_URL:jdbc:mysql://127.0.0.1:3306/salchichon?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC}}
     user: ${SALCHICHON_API_MIGRATION_DB_USER:${SALCHICHON_API_DB_USER:salchichon_readonly}}
     password: ${SALCHICHON_API_MIGRATION_DB_PASSWORD:${SALCHICHON_API_DB_PASSWORD:}}
