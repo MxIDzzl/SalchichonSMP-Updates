@@ -79,7 +79,7 @@ public class PublicDataRepository {
                 LEFT JOIN public_clans pc
                     ON pc.clan_uuid = pcm.clan_uuid AND pc.is_active = TRUE
                 WHERE pd.uuid = ?
-                """, (rs, row) -> mapPlayer(rs, today), uuid);
+                """, (rs, row) -> mapPlayer(rs, today), uuid.toString());
         return rows.stream().findFirst();
     }
 
@@ -155,7 +155,7 @@ public class PublicDataRepository {
                 rs.getLong("official_deaths"),
                 rs.getLong("playtime_ticks"),
                 rs.getBigDecimal("player_value").toPlainString(),
-                rs.getObject("clan_uuid", UUID.class),
+                uuidOrNull(rs.getString("clan_uuid")),
                 rs.getString("clan_name"),
                 rs.getString("clan_tag"),
                 rs.getObject("clan_level", Integer.class),
