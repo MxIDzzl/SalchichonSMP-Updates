@@ -52,8 +52,8 @@ export default async function Home() {
 
       <section className="season-band" id="season">
         <div className="wrap season-inner">
-          <div><div className="section-kicker">01 / TEMPORADA</div><h2>{overview?.seasonName ?? "UHC SEASON 1"}</h2><p>{overview?.seasonDescription ?? "La temporada actual del Escuadrón Salchichón."}</p></div>
-          <div className="season-meta"><div><span>DIFICULTAD</span><strong>{overview?.difficulty ?? "HARD"}</strong></div><div><span>INICIO</span><strong>{overview?.seasonStartDate ?? "2026-10-19"}</strong></div><div><span>ESTADO</span><strong className="live">EN CURSO</strong></div></div>
+          <div><div className="section-kicker">01 / TEMPORADA</div><h2>{overview?.seasonName ?? "TEMPORADA SIN SINCRONIZAR"}</h2><p>{overview?.seasonDescription ?? "La temporada actual del Escuadrón Salchichón."}</p></div>
+          <div className="season-meta"><div><span>DIFICULTAD</span><strong>{overview?.difficulty ?? "—"}</strong></div><div><span>INICIO</span><strong>{overview?.seasonStartDate ?? "—"}</strong></div><div><span>ESTADO</span><strong className="live">EN CURSO</strong></div></div>
         </div>
       </section>
 
