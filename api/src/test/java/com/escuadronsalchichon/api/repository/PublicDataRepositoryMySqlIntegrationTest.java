@@ -1,6 +1,5 @@
 package com.escuadronsalchichon.api.repository;
 
-import com.escuadronsalchichon.api.dto.AnnouncementResponse;
 import com.escuadronsalchichon.api.dto.ClanDetailResponse;
 import com.escuadronsalchichon.api.dto.PlayerSummaryResponse;
 import com.escuadronsalchichon.api.dto.UpcomingUpdateResponse;
