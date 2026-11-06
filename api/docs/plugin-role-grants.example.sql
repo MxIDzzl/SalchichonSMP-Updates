@@ -22,6 +22,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON salchichon.player_value_adjustments TO '
 GRANT SELECT, INSERT, UPDATE, DELETE ON salchichon.player_skins TO 'salchichon_plugin'@'PAPER_SERVER_IP';
 GRANT SELECT, INSERT, UPDATE, DELETE ON salchichon.public_clans TO 'salchichon_plugin'@'PAPER_SERVER_IP';
 GRANT SELECT, INSERT, UPDATE, DELETE ON salchichon.player_clan_memberships TO 'salchichon_plugin'@'PAPER_SERVER_IP';
+GRANT REFERENCES ON salchichon.public_clans TO 'salchichon_plugin'@'PAPER_SERVER_IP';
 
 -- Retained for compatibility with the existing trade persistence contract.
 -- Actual player-to-player trades remain owned by the external trade plugin.
