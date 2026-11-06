@@ -13,11 +13,13 @@ Variables de entorno:
 - `SALCHICHON_API_DB_URL` (por defecto localhost:5432/salchichon)
 - `SALCHICHON_API_DB_USER`, `SALCHICHON_API_DB_PASSWORD`
 - `SALCHICHON_WEB_ORIGINS` (orígenes separados por coma)
-- `SALCHICHON_SEASON_NAME`, `SALCHICHON_SEASON_DESCRIPTION`, `SALCHICHON_SEASON_DIFFICULTY`, `SALCHICHON_SEASON_START_DATE`, `SALCHICHON_SERVER_TIMEZONE`
+- `SALCHICHON_SEASON_NAME`, `SALCHICHON_SEASON_DESCRIPTION`, `SALCHICHON_SEASON_DIFFICULTY`, `SALCHICHON_SEASON_DIFFICULTY_STAGES`, `SALCHICHON_SEASON_START_DATE`, `SALCHICHON_SERVER_TIMEZONE`
 - `SALCHICHON_API_FLYWAY_ENABLED` (por defecto false)
 - `SALCHICHON_API_MIGRATION_DB_URL`, `SALCHICHON_API_MIGRATION_DB_USER`, `SALCHICHON_API_MIGRATION_DB_PASSWORD` (credenciales DDL separadas)
 - `SALCHICHON_ADMIN_ENABLED` (por defecto false), `SALCHICHON_ADMIN_TOKEN` (mínimo 32 caracteres aleatorios), `SALCHICHON_ADMIN_ACTOR` (identidad de auditoría del servidor)
 - `SALCHICHON_ADMIN_DB_URL`, `SALCHICHON_ADMIN_DB_USER`, `SALCHICHON_ADMIN_DB_PASSWORD` (pool privado de escritura)
+
+La dificultad puede avanzar automáticamente por día de temporada mediante `SALCHICHON_SEASON_DIFFICULTY_STAGES`, con formato `1:HARD,14:HARD+,28:EXTREME`; cada umbral indica el primer día en que entra en vigor. Si se deja vacío o la fecha de inicio no está configurada, se usa `SALCHICHON_SEASON_DIFFICULTY`. Este ajuste solo publica la etapa: no cambia todavía los atributos ni niveles de mobs.
 
 No usar el usuario administrador de PostgreSQL como credencial runtime. El pool público permanece read-only. El ejemplo `docs/public-role-grants.example.sql` limita el rol público a SELECT sobre `player_data`, `player_stats`, `player_skins`, `public_clans`, `player_clan_memberships` y `public_announcements`; no concede escritura ni acceso a bóveda/trades. Flyway está desactivado por defecto y usa credenciales de migración separadas.
 
