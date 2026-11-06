@@ -48,7 +48,7 @@ La web consulta la API desde el servidor mediante `SALCHICHON_API_URL`. Nunca ex
 - PostgreSQL debe permanecer privado.
 - La API pública utiliza un rol SELECT-only.
 - El panel /admin permanece sin operaciones y la API administrativa desactivada hasta completar autenticación y autorización reales.
-- Player Value permanece desactivado hasta terminar la GUI tipo cofre y las pruebas de recuperación.
+- Player Value ya tiene selector tipo cofre; permanece desactivado hasta completar pruebas de recuperación y staging.
 - Los intercambios los gestiona el plugin externo.
 - La sincronización de clanes es de solo lectura desde zMClans.
 
