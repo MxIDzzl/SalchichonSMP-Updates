@@ -10,7 +10,7 @@ export default async function PlayerProfile({ params }: { params: Promise<{ user
     <Link href="/players">← Todos los jugadores</Link>
     {player ? <>
       <header className="profile-heading">
-        {player.skinTextureHash ? <img className="skin-avatar" src={`https://mc-heads.net/avatar/${player.skinTextureHash}/64`} alt={`Skin de ${player.username}`} /> : <span className="skin-avatar-empty" aria-label="Skin no disponible" />}
+        {player.skinTextureHash ? <img className="skin-texture" src={`https://textures.minecraft.net/texture/${player.skinTextureHash}`} alt={`Skin de ${player.username}`} /> : <span className="skin-avatar-empty" aria-label="Skin no disponible" />}
         <div><small>PERFIL DE JUGADOR</small><h1>{player.username}</h1><p>Estadísticas oficiales de la temporada.</p></div>
       </header>
       <section className="profile-grid">
