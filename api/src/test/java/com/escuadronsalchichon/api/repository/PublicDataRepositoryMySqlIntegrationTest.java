@@ -53,6 +53,8 @@ class PublicDataRepositoryMySqlIntegrationTest {
         }
         Flyway.configure()
                 .dataSource(dataSource)
+                .baselineOnMigrate(true)
+                .baselineVersion("0")
                 .locations("classpath:db/migration/mysql")
                 .load()
                 .migrate();
