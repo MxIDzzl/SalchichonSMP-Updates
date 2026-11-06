@@ -55,9 +55,8 @@ public class AdminPlayerStatsController {
             if (player.isEmpty()) return null;
 
             jdbc.update("""
-                    INSERT INTO player_stats(player_uuid, official_deaths, playtime_ticks, updated_at)
+                    INSERT IGNORE INTO player_stats(player_uuid, official_deaths, playtime_ticks, updated_at)
                     VALUES (?, 0, 0, UTC_TIMESTAMP(6))
-                    ON DUPLICATE KEY UPDATE player_uuid = VALUES(player_uuid)
                     """, uuid.toString());
 
             Long previous = jdbc.queryForObject(
