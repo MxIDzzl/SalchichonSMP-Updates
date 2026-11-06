@@ -27,3 +27,7 @@
 .directory-pagination a{color:#ff8fa3;padding:10px 14px;border:1px solid var(--line);border-radius:10px}
 .directory-pagination a:hover{background:#211a2a;border-color:rgba(255,143,163,.4)}
 @media(max-width:650px){.directory-pagination{font-size:10px}.directory-pagination a{padding:9px 10px}}
+
+
+/* SkinsRestorer stores the public Mojang texture hash; render the actual skin texture, not an offline UUID head lookup. */
+.skin-texture{width:112px;height:224px;object-fit:contain;object-position:center top;border:1px solid var(--line);border-radius:14px;background:#15121d;image-rendering:pixelated;flex:none}
